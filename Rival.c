@@ -137,6 +137,7 @@ int main(int argc, char **argv)
     playerIndex = 0;
     rivalIndex = width * length - 1;
   }
+  printf("[?25l");
   setbuf(stdout, NULL);
   printf("[2J");
   system("/bin/stty raw");
