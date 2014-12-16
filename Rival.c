@@ -109,8 +109,8 @@ void draw(int width, int length, int playerIndex, int rivalIndex)
 
 int main(int argc, char **argv)
 {
-#define width 32
-#define length 16
+#define width 80
+#define length 40
   int playerIndex, rivalIndex;
   if (argc == 2) {
     playerSkin = "\u263a";
