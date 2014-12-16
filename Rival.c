@@ -106,11 +106,15 @@ void draw(int width, int length, int playerIndex, int rivalIndex)
   }
 }
 
-void drawTurnMessage(bool myTurn)
+void drawHelpText(bool myTurn, int movesLeft)
 {
   printf("[41;1H");
   printf("[K");
-  printf((myTurn) ? "It's your turn!" : "It's your opponent's turn!");
+  printf("Controls: h,j,k,l: navigate, n: end turn, q: quit");
+  printf("[42;1H");
+  printf("[K");
+  printf((myTurn) ? "It's your turn! Moves left: %d."
+    : "It's your opponent's turn!", movesLeft);
 }
 
 int main(int argc, char **argv)
@@ -148,9 +152,9 @@ int main(int argc, char **argv)
     goto EndTurn;
   }
   while (true) {
-    drawTurnMessage(true);
     movesLeft = 5;
     while (true) {
+      drawHelpText(true, movesLeft);
       userInput = getchar();
       if (userInput != '\n') {
         switch (userInput) {
@@ -216,7 +220,7 @@ int main(int argc, char **argv)
       }
     }
 EndTurn:
-    drawTurnMessage(false);
+    drawHelpText(false, movesLeft);
     bool rivalTurn = true;
     while (rivalTurn) {
       if (getMessage(&networkInput) == -1) {
