@@ -172,7 +172,7 @@ int main(int argc, char **argv)
           break;
          case 'k':
           if (movesLeft) {
-            if (playerIndex > width) {
+            if (playerIndex > width - 1) {
               playerIndex -= width;
               draw(width, length, playerIndex, rivalIndex);
               if (sendMessage('k') == -1) {
