@@ -84,6 +84,8 @@ int sendMessage(char message)
     (struct sockaddr *) &clientAddress, clientAddressSize);
 }
 
+char *playerSkin, *rivalSkin;
+
 void draw(int width, int length, int playerIndex, int rivalIndex)
 {
   printf("[2J");
@@ -94,9 +96,9 @@ void draw(int width, int length, int playerIndex, int rivalIndex)
     for (j; j < width; j++) {
       index = i * width + j;
       if (index == playerIndex) {
-        printf("\u263b");
+        printf(playerSkin);
       } else if (index == rivalIndex) {
-        printf("\u263a");
+        printf(rivalSkin);
       } else {
         printf(".");
       }
@@ -111,6 +113,8 @@ int main(int argc, char **argv)
 #define length 16
   int playerIndex, rivalIndex;
   if (argc == 2) {
+    playerSkin = "\u263a";
+    rivalSkin = "\u263b";
     playerIndex = width * length - 1;
     rivalIndex = 0;
     connectToServer(argv[1]);
@@ -118,6 +122,8 @@ int main(int argc, char **argv)
     if (startServer() == EXIT_FAILURE) {
       return EXIT_FAILURE;
     }
+    playerSkin = "\u263b";
+    rivalSkin = "\u263a";
     playerIndex = 0;
     rivalIndex = width * length - 1;
   }
