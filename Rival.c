@@ -88,7 +88,6 @@ char *playerSkin, *rivalSkin;
 
 void draw(int width, int length, int playerIndex, int rivalIndex)
 {
-  printf("[2J");
   printf("[1;1H");
   int i = 0, j, index;
   for (i; i < length; i++) {
@@ -105,6 +104,13 @@ void draw(int width, int length, int playerIndex, int rivalIndex)
     }
     printf("[E");
   }
+}
+
+void drawTurnMessage(bool myTurn)
+{
+  printf("[41;1H");
+  printf("[K");
+  printf((myTurn) ? "It's your turn!" : "It's your opponent's turn!");
 }
 
 int main(int argc, char **argv)
@@ -142,7 +148,7 @@ int main(int argc, char **argv)
     goto EndTurn;
   }
   while (true) {
-    printf("[EIt's your turn!\n");
+    drawTurnMessage(true);
     movesLeft = 5;
     while (true) {
       userInput = getchar();
@@ -210,7 +216,7 @@ int main(int argc, char **argv)
       }
     }
 EndTurn:
-    printf("[EIt's the opponent's turn!\n");
+    drawTurnMessage(false);
     bool rivalTurn = true;
     while (rivalTurn) {
       if (getMessage(&networkInput) == -1) {
