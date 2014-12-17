@@ -9,7 +9,7 @@
 #include <unistd.h>
 
 struct Player {
-  int attack, defence, health, position;
+  int attack, defence, health, x, y;
   char *skin;
 };
 
@@ -92,14 +92,13 @@ int sendMessage(char message)
 void draw(int width, int length, struct Player me, struct Player rival)
 {
   printf("[1;1H");
-  int i = 0, j, index;
-  for (i; i < length; i++) {
-    j = 0;
-    for (j; j < width; j++) {
-      index = i * width + j;
-      if (index == me.position) {
+  int y = 0, x, index;
+  for (y; y < length; y++) {
+    x = 0;
+    for (x; x < width; x++) {
+      if (x == me.x && y == me.y) {
         printf(me.skin);
-      } else if (index == rival.position) {
+      } else if (x == rival.x && y == rival.y) {
         printf(rival.skin);
       } else {
         printf(".");
@@ -129,8 +128,9 @@ int main(int argc, char **argv)
   if (argc == 2) {
     me.skin = "\u263a";
     rival.skin = "\u263b";
-    me.position = width * length - 1;
-    rival.position = 0;
+    me.x = width - 1;
+    me.y = length - 1;
+    rival.x = rival.y = 0;
     connectToServer(argv[1]);
   } else {
     if (startServer() == EXIT_FAILURE) {
@@ -138,8 +138,9 @@ int main(int argc, char **argv)
     }
     me.skin = "\u263b";
     rival.skin = "\u263a";
-    me.position = 0;
-    rival.position = width * length - 1;
+    me.x = me.y = 0;
+    rival.x = width - 1;
+    rival.y = length - 1;
   }
   me.health = rival.health = 10;
   me.attack = rival.attack = 5;
@@ -156,7 +157,7 @@ int main(int argc, char **argv)
   char networkInput, userInput, messageBuffer[100] = {'\0'},
     map[width * length];
   draw(width, length, me, rival);
-  if (me.position == (width * length - 1)) {
+  if (me.x == width - 1 && me.y == length - 1) {
     goto EndTurn;
   }
   while (true) {
@@ -168,8 +169,8 @@ int main(int argc, char **argv)
         switch (userInput) {
         case 'j':
           if (movesLeft) {
-            if ((me.position < (length * (width - 1)))) {
-              me.position += width;
+            if (me.y < length - 1) {
+              me.y++;
               draw(width, length, me ,rival);
               if (sendMessage('j') == -1) {
                 goto CleanUpAndExitWithError;
@@ -180,8 +181,8 @@ int main(int argc, char **argv)
           break;
          case 'k':
           if (movesLeft) {
-            if (me.position > width - 1) {
-              me.position -= width;
+            if (me.y > 0) {
+              me.y--;
               draw(width, length, me ,rival);
               if (sendMessage('k') == -1) {
                 goto CleanUpAndExitWithError;
@@ -192,8 +193,8 @@ int main(int argc, char **argv)
           break;      
         case 'l':
 	  if (movesLeft) {
-	    if ((me.position % width) != width - 1) {
-	      me.position++;
+	    if (me.x < width - 1) {
+	      me.x++;
 	      draw(width, length, me ,rival);
 	      if (sendMessage('l') == -1) {
 		goto CleanUpAndExitWithError;
@@ -204,8 +205,8 @@ int main(int argc, char **argv)
 	  break;
         case 'h':
           if (movesLeft) {
-            if ((me.position % width) > 0) {
-              me.position--;
+            if (me.x > 0) {
+              me.x--;
               draw(width, length, me ,rival);
               if (sendMessage('h') == -1) {
                 goto CleanUpAndExitWithError;
@@ -236,19 +237,19 @@ EndTurn:
       }
       switch (networkInput) {
       case 'h':
-        rival.position--;
+        rival.x--;
         draw(width, length, me ,rival);
         break;
       case 'j':
-        rival.position += width;
+        rival.y++;
         draw(width, length, me ,rival);
         break;
       case 'k':
-        rival.position -= width;
+        rival.y--;
         draw(width, length, me ,rival);
         break;
       case 'l':
-        rival.position++;
+        rival.x++;
         draw(width, length, me ,rival);
         break;
       case 'n':
