@@ -13,25 +13,17 @@ int main(int argc, char **argv)
 {
   struct Player me, rival;
   if (argc == 2) {
-    me.skin = "\u263a";
-    rival.skin = "\u263b";
-    me.x = WIDTH - 1;
-    me.y = LENGTH - 1;
-    rival.x = rival.y = 0;
+    me = NewPlayer(NewEntity(WIDTH - 1, LENGTH - 1, true, "\u263a"), 5, 5, 10);
+    rival = NewPlayer(NewEntity(0, 0, true, "\u263b"), 5, 5, 10);
     connectToServer(argv[1]);
   } else {
     if (startServer() == EXIT_FAILURE) {
       return EXIT_FAILURE;
     }
-    me.skin = "\u263b";
-    rival.skin = "\u263a";
-    me.x = me.y = 0;
-    rival.x = WIDTH - 1;
-    rival.y = LENGTH - 1;
+    me = NewPlayer(NewEntity(0, 0, true, "\u263b"), 5, 5, 10);
+    rival = NewPlayer(NewEntity(WIDTH - 1, LENGTH - 1, true, "\u263a"), 5, 5,
+      10);
   }
-  me.health = rival.health = 10;
-  me.attack = rival.attack = 5;
-  me.defence = rival.defence = 5;
   printf("[?25l");
   setbuf(stdout, NULL);
   printf("[2J");
@@ -44,7 +36,7 @@ int main(int argc, char **argv)
   char networkInput, userInput, messageBuffer[100] = {'\0'},
     map[WIDTH * LENGTH];
   draw(WIDTH, LENGTH, me, rival);
-  if (me.x == WIDTH - 1 && me.y == LENGTH - 1) {
+  if (me.entity.x == WIDTH - 1 && me.entity.y == LENGTH - 1) {
     goto EndTurn;
   }
   while (true) {
@@ -73,8 +65,8 @@ int main(int argc, char **argv)
           break;
         case 'j':
           if (movesLeft) {
-            if (me.y < LENGTH - 1) {
-              me.y++;
+            if (me.entity.y < LENGTH - 1) {
+              me.entity.y++;
               draw(WIDTH, LENGTH, me ,rival);
               if (sendMessage('j') == -1) {
                 goto CleanUpAndExitWithError;
@@ -85,8 +77,8 @@ int main(int argc, char **argv)
           break;
          case 'k':
           if (movesLeft) {
-            if (me.y > 0) {
-              me.y--;
+            if (me.entity.y > 0) {
+              me.entity.y--;
               draw(WIDTH, LENGTH, me ,rival);
               if (sendMessage('k') == -1) {
                 goto CleanUpAndExitWithError;
@@ -97,8 +89,8 @@ int main(int argc, char **argv)
           break;      
         case 'l':
 	  if (movesLeft) {
-	    if (me.x < WIDTH - 1) {
-	      me.x++;
+	    if (me.entity.x < WIDTH - 1) {
+	      me.entity.x++;
 	      draw(WIDTH, LENGTH, me ,rival);
 	      if (sendMessage('l') == -1) {
 		goto CleanUpAndExitWithError;
@@ -109,8 +101,8 @@ int main(int argc, char **argv)
 	  break;
         case 'h':
           if (movesLeft) {
-            if (me.x > 0) {
-              me.x--;
+            if (me.entity.x > 0) {
+              me.entity.x--;
               draw(WIDTH, LENGTH, me ,rival);
               if (sendMessage('h') == -1) {
                 goto CleanUpAndExitWithError;
@@ -147,19 +139,19 @@ EndTurn:
         drawHelpText(me, false, movesLeft);
         break;
       case 'h':
-        rival.x--;
+        rival.entity.x--;
         draw(WIDTH, LENGTH, me ,rival);
         break;
       case 'j':
-        rival.y++;
+        rival.entity.y++;
         draw(WIDTH, LENGTH, me ,rival);
         break;
       case 'k':
-        rival.y--;
+        rival.entity.y--;
         draw(WIDTH, LENGTH, me ,rival);
         break;
       case 'l':
-        rival.x++;
+        rival.entity.x++;
         draw(WIDTH, LENGTH, me ,rival);
         break;
       case 'n':

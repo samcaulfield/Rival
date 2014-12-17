@@ -10,10 +10,10 @@ void draw(int width, int length, struct Player me, struct Player rival)
   for (y; y < length; y++) {
     x = 0;
     for (x; x < width; x++) {
-      if (x == me.x && y == me.y) {
-        printf(me.skin);
-      } else if (x == rival.x && y == rival.y) {
-        printf(rival.skin);
+      if (x == me.entity.x && y == me.entity.y) {
+        printf(me.entity.skin);
+      } else if (x == rival.entity.x && y == rival.entity.y) {
+        printf(rival.entity.skin);
       } else {
         printf(".");
       }
