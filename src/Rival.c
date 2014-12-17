@@ -117,6 +117,8 @@ int main(int argc, char **argv)
 	  }
 	  goto EndTurn;
 	case 'q':
+          addMessage("You quit the game. You lose!");
+          drawHelpText(me, true, movesLeft);
 	  if (sendMessage('q') == -1) {
 	    goto CleanUpAndExitWithError;
 	  }
@@ -158,7 +160,8 @@ EndTurn:
         rivalTurn = false;
         break;
       case 'q':
-        printf("[EYour opponent has quit. You win!\n[E");
+        addMessage("Your opponent has quit. You win!");
+        drawHelpText(me, false, movesLeft);
         goto CleanUpAndExit;
         break;
       }
