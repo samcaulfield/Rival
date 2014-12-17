@@ -182,6 +182,20 @@ int main(int argc, char **argv)
       userInput = getchar();
       if (userInput != '\n') {
         switch (userInput) {
+        case 'a':
+          if (movesLeft) {
+            if (distance(me, rival) <= 1) {
+              int meHp = me.health, rivalHp = rival.health;
+              attack(&me, &rival);
+              int meLost = me.health - meHp, rivalLost = rivalHp - rival.health;
+              if (sendMessage('a') == -1) {
+                goto CleanUpAndExitWithError;
+              }
+              draw(width, length, me, rival);
+              movesLeft--;
+            }
+          }
+          break;
         case 'j':
           if (movesLeft) {
             if (me.y < length - 1) {
@@ -251,6 +265,11 @@ EndTurn:
         goto CleanUpAndExitWithError;
       }
       switch (networkInput) {
+      case 'a':
+        attack(&me, &rival);
+        draw(width, length, me, rival);
+        drawHelpText(me, false, movesLeft);
+        break;
       case 'h':
         rival.x--;
         draw(width, length, me ,rival);
