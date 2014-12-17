@@ -108,6 +108,15 @@ void draw(int width, int length, struct Player me, struct Player rival)
   }
 }
 
+char *message0, *message1, *message2;
+
+void addMessage(char *message)
+{
+  message2 = message1;
+  message1 = message0;
+  message0 = message;
+}
+
 void drawHelpText(struct Player me, bool myTurn, int movesLeft)
 {
   printf("[41;1H");
@@ -118,6 +127,15 @@ void drawHelpText(struct Player me, bool myTurn, int movesLeft)
   printf("[K");
   printf((myTurn) ? "It's your turn! Moves left: %d."
     : "It's your opponent's turn!", movesLeft);
+  printf("[43;1H");
+  printf("[K");
+  printf(message0);
+  printf("[44;1H");
+  printf("[K");
+  printf(message1);
+  printf("[45;1H");
+  printf("[K");
+  printf(message2);
 }
 
 void attack(struct Player *a, struct Player *b)
@@ -193,6 +211,9 @@ int main(int argc, char **argv)
               }
               draw(width, length, me, rival);
               movesLeft--;
+              addMessage("Attack!");
+            } else {
+              addMessage("Nothing to attack.");
             }
           }
           break;
@@ -268,6 +289,7 @@ EndTurn:
       case 'a':
         attack(&me, &rival);
         draw(width, length, me, rival);
+        addMessage("You have been attacked!");
         drawHelpText(me, false, movesLeft);
         break;
       case 'h':
