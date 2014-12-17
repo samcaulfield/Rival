@@ -120,6 +120,11 @@ void drawHelpText(struct Player me, bool myTurn, int movesLeft)
     : "It's your opponent's turn!", movesLeft);
 }
 
+int distance(struct Player a, struct Player b)
+{
+  return abs(a.x - b.x) + abs(a.y - b.y);
+}
+
 int main(int argc, char **argv)
 {
 #define width 80
