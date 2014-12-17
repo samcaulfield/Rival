@@ -169,6 +169,7 @@ CleanUpAndExitWithError:
   perror("main()");
 CleanUpAndExit:
   printf("[E");
+  printf("[?25h");
   tcgetattr(STDIN_FILENO, &oldTerminalSettings);
   oldTerminalSettings.c_lflag |= ECHO;
   tcsetattr(STDIN_FILENO, TCSANOW, &oldTerminalSettings);
