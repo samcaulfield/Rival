@@ -6,86 +6,17 @@
 #include <unistd.h>
 
 #include "../include/Network.h"
-
-struct Player {
-  int attack, defence, health, x, y;
-  char *skin;
-};
-
-void draw(int width, int length, struct Player me, struct Player rival)
-{
-  printf("[1;1H");
-  int y = 0, x, index;
-  for (y; y < length; y++) {
-    x = 0;
-    for (x; x < width; x++) {
-      if (x == me.x && y == me.y) {
-        printf(me.skin);
-      } else if (x == rival.x && y == rival.y) {
-        printf(rival.skin);
-      } else {
-        printf(".");
-      }
-    }
-    printf("[E");
-  }
-}
-
-char *message0, *message1, *message2;
-
-void addMessage(char *message)
-{
-  message2 = message1;
-  message1 = message0;
-  message0 = message;
-}
-
-void drawHelpText(struct Player me, bool myTurn, int movesLeft)
-{
-  printf("[41;1H");
-  printf("[K");
-  printf("Controls: h,j,k,l: navigate, n: end turn, q: quit");
-  printf("         HP: %d, ATK: %d, DEF: %d", me.health, me.attack, me.defence);
-  printf("[42;1H");
-  printf("[K");
-  printf((myTurn) ? "It's your turn! Moves left: %d."
-    : "It's your opponent's turn!", movesLeft);
-  printf("[43;1H");
-  printf("[K");
-  printf(message0);
-  printf("[44;1H");
-  printf("[K");
-  printf(message1);
-  printf("[45;1H");
-  printf("[K");
-  printf(message2);
-}
-
-void attack(struct Player *a, struct Player *b)
-{
-  int aStrength = a->attack - b->defence;
-  aStrength = (aStrength < 0) ? 0 : aStrength;
-  b->health -= aStrength;
-  int bStrength = b->attack - a->defence;
-  bStrength = (bStrength < 0) ? 0 : bStrength;
-  a->health -= bStrength;
-}
-
-int distance(struct Player a, struct Player b)
-{
-  return abs(a.x - b.x) + abs(a.y - b.y);
-}
+#include "../include/Scene.h"
+#include "../include/Rendering.h"
 
 int main(int argc, char **argv)
 {
-#define width 80
-#define length 40
   struct Player me, rival;
   if (argc == 2) {
     me.skin = "\u263a";
     rival.skin = "\u263b";
-    me.x = width - 1;
-    me.y = length - 1;
+    me.x = WIDTH - 1;
+    me.y = LENGTH - 1;
     rival.x = rival.y = 0;
     connectToServer(argv[1]);
   } else {
@@ -95,8 +26,8 @@ int main(int argc, char **argv)
     me.skin = "\u263b";
     rival.skin = "\u263a";
     me.x = me.y = 0;
-    rival.x = width - 1;
-    rival.y = length - 1;
+    rival.x = WIDTH - 1;
+    rival.y = LENGTH - 1;
   }
   me.health = rival.health = 10;
   me.attack = rival.attack = 5;
@@ -111,9 +42,9 @@ int main(int argc, char **argv)
   tcsetattr(STDIN_FILENO, TCSANOW, &oldTerminalSettings);
   int movesLeft;
   char networkInput, userInput, messageBuffer[100] = {'\0'},
-    map[width * length];
-  draw(width, length, me, rival);
-  if (me.x == width - 1 && me.y == length - 1) {
+    map[WIDTH * LENGTH];
+  draw(WIDTH, LENGTH, me, rival);
+  if (me.x == WIDTH - 1 && me.y == LENGTH - 1) {
     goto EndTurn;
   }
   while (true) {
@@ -132,7 +63,7 @@ int main(int argc, char **argv)
               if (sendMessage('a') == -1) {
                 goto CleanUpAndExitWithError;
               }
-              draw(width, length, me, rival);
+              draw(WIDTH, LENGTH, me, rival);
               movesLeft--;
               addMessage("Attack!");
             } else {
@@ -142,9 +73,9 @@ int main(int argc, char **argv)
           break;
         case 'j':
           if (movesLeft) {
-            if (me.y < length - 1) {
+            if (me.y < LENGTH - 1) {
               me.y++;
-              draw(width, length, me ,rival);
+              draw(WIDTH, LENGTH, me ,rival);
               if (sendMessage('j') == -1) {
                 goto CleanUpAndExitWithError;
               }
@@ -156,7 +87,7 @@ int main(int argc, char **argv)
           if (movesLeft) {
             if (me.y > 0) {
               me.y--;
-              draw(width, length, me ,rival);
+              draw(WIDTH, LENGTH, me ,rival);
               if (sendMessage('k') == -1) {
                 goto CleanUpAndExitWithError;
               }
@@ -166,9 +97,9 @@ int main(int argc, char **argv)
           break;      
         case 'l':
 	  if (movesLeft) {
-	    if (me.x < width - 1) {
+	    if (me.x < WIDTH - 1) {
 	      me.x++;
-	      draw(width, length, me ,rival);
+	      draw(WIDTH, LENGTH, me ,rival);
 	      if (sendMessage('l') == -1) {
 		goto CleanUpAndExitWithError;
 	      }
@@ -180,7 +111,7 @@ int main(int argc, char **argv)
           if (movesLeft) {
             if (me.x > 0) {
               me.x--;
-              draw(width, length, me ,rival);
+              draw(WIDTH, LENGTH, me ,rival);
               if (sendMessage('h') == -1) {
                 goto CleanUpAndExitWithError;
               }
@@ -211,25 +142,25 @@ EndTurn:
       switch (networkInput) {
       case 'a':
         attack(&me, &rival);
-        draw(width, length, me, rival);
+        draw(WIDTH, LENGTH, me, rival);
         addMessage("You have been attacked!");
         drawHelpText(me, false, movesLeft);
         break;
       case 'h':
         rival.x--;
-        draw(width, length, me ,rival);
+        draw(WIDTH, LENGTH, me ,rival);
         break;
       case 'j':
         rival.y++;
-        draw(width, length, me ,rival);
+        draw(WIDTH, LENGTH, me ,rival);
         break;
       case 'k':
         rival.y--;
-        draw(width, length, me ,rival);
+        draw(WIDTH, LENGTH, me ,rival);
         break;
       case 'l':
         rival.x++;
-        draw(width, length, me ,rival);
+        draw(WIDTH, LENGTH, me ,rival);
         break;
       case 'n':
         rivalTurn = false;
