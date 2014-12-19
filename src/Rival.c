@@ -83,7 +83,7 @@ int main(int argc, char **argv)
   tcsetattr(STDIN_FILENO, TCSANOW, &oldTerminalSettings);
   int movesLeft;
   char networkInput, userInput, messageBuffer[100] = {'\0'};
-  /* SegFault. */ draw(scene);
+  draw(scene);
   /* Figuring out which player this is based on their position. Not great. */
   if (me->entity->x == scene->width - 1 && me->entity->y == scene->length - 1) {
     goto EndTurn;
