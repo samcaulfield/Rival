@@ -2,11 +2,13 @@
 
 #include "../include/rvlLinkedList.h"
 
-rvlError rvlLinkedListGet(rvlLinkedList *list, int index, void **data)
+rvlError rvlLinkedListGet(rvlLinkedList *list, uint32_t index, void **data)
 {
+  if (list == NULL || index >= list->size)
+    return rvlNoError;
   rvlLinkedNode *node = list->first;
   uint32_t i = 0;
-  while (i < index)
+  while (i++ < index)
     node = node->next;
   *data = node->data;
   return rvlNoError;
@@ -39,12 +41,13 @@ rvlError rvlLinkedListInsert(rvlLinkedList *list, void *data)
     list->first = newNode;
     list->first->next = temp;
     temp->previous = list->first;
+    list->first->data = data;
   }
   list->size++;
   return rvlNoError;
 }
 
-rvlError rvLinkedListNewH(rvlLinkedList **new)
+rvlError rvlLinkedListNewH(rvlLinkedList **new)
 {
   *new = (rvlLinkedList *) malloc(sizeof(rvlLinkedList));
   if (*new == NULL) {
