@@ -1,11 +1,11 @@
 #ifndef RENDERING_H
 #define RENDERING_H
 
-void draw(int width, int length, struct Player me, struct Player rival);
+void draw(rvlScene *scene);
 
 void addMessage(char *message);
 
-void drawHelpText(struct Player me, bool myTurn, int movesLeft);
+void drawHelpText(rvlPlayer *me, bool myTurn, int movesLeft);
 
 #endif
 

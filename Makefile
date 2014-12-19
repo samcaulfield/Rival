@@ -6,9 +6,9 @@ SRCDIR=src/
 all: Rival
 
 Rival: $(OBJDIR)Rival.o $(OBJDIR)Network.o $(OBJDIR)Rendering.o \
-$(OBJDIR)Scene.o $(OBJDIR)rvlLinkedList.o
+$(OBJDIR)rvlScene.o $(OBJDIR)rvlLinkedList.o
 	$(CC) $(OBJDIR)Rival.o $(OBJDIR)Network.o $(OBJDIR)Rendering.o \
-	$(OBJDIR)Scene.o $(OBJDIR)rvlLinkedList.o -o Rival
+	$(OBJDIR)rvlScene.o $(OBJDIR)rvlLinkedList.o -o Rival
 
 $(OBJDIR)Rival.o: $(SRCDIR)Rival.c
 	$(CC) $(CFLAGS) $(SRCDIR)Rival.c -o $(OBJDIR)Rival.o
@@ -16,8 +16,8 @@ $(OBJDIR)Rival.o: $(SRCDIR)Rival.c
 $(OBJDIR)Network.o: $(SRCDIR)Network.c
 	$(CC) $(CFLAGS) $(SRCDIR)Network.c -o $(OBJDIR)Network.o
 
-$(OBJDIR)Scene.o: $(SRCDIR)Scene.c
-	$(CC) $(CFLAGS) $(SRCDIR)Scene.c -o $(OBJDIR)Scene.o
+$(OBJDIR)rvlScene.o: $(SRCDIR)rvlScene.c
+	$(CC) $(CFLAGS) $(SRCDIR)rvlScene.c -o $(OBJDIR)rvlScene.o
 
 $(OBJDIR)Rendering.o: $(SRCDIR)Rendering.c
 	$(CC) $(CFLAGS) $(SRCDIR)Rendering.c -o $(OBJDIR)Rendering.o

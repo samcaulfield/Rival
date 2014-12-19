@@ -5,25 +5,74 @@
 #include <termios.h>
 #include <unistd.h>
 
+#include "../include/rvlError.h"
 #include "../include/Network.h"
-#include "../include/Scene.h"
+#include "../include/rvlScene.h"
 #include "../include/Rendering.h"
 
 int main(int argc, char **argv)
 {
-  struct Player me, rival;
-  if (argc == 2) {
-    me = NewPlayer(NewEntity(WIDTH - 1, LENGTH - 1, true, "\u263a"), 5, 5, 10);
-    rival = NewPlayer(NewEntity(0, 0, true, "\u263b"), 5, 5, 10);
-    connectToServer(argv[1]);
-  } else {
-    if (startServer() == EXIT_FAILURE) {
+  const int mapWidth = 80, mapLength = 40;
+  /* Initialise the players. The player who waited for a connection begins in
+   * the top left, the other player is in the bottom right. */
+  rvlEntity *topLeftPlayer, *bottomRightPlayer;
+  rvlError error;
+  error = rvlEntityNewH(&topLeftPlayer, 0, 0, true, "\u263b");
+  if (error != rvlNoError) {
+    printf("main(): Could not allocate player object.\n");
+    return EXIT_FAILURE;
+  }
+  error = rvlEntityNewH(&bottomRightPlayer, mapWidth - 1, mapLength - 1, true,
+    "\u263a");
+  if (error != rvlNoError) {
+    printf("main(): Could not allocate player object.\n");
+    free(topLeftPlayer);
+    return EXIT_FAILURE;
+  }
+  rvlPlayer *me, *rival;
+  if (argc == 2) { /* "Connecting" player. */
+    error = rvlPlayerNewH(&me, bottomRightPlayer, 5, 5, 10);
+    if (error != rvlNoError) {
+      printf("main(): Could not allocate player object.\n");
+      free(topLeftPlayer);
+      free(bottomRightPlayer);
       return EXIT_FAILURE;
     }
-    me = NewPlayer(NewEntity(0, 0, true, "\u263b"), 5, 5, 10);
-    rival = NewPlayer(NewEntity(WIDTH - 1, LENGTH - 1, true, "\u263a"), 5, 5,
-      10);
+    error = rvlPlayerNewH(&rival, topLeftPlayer, 5, 5, 10);
+    if (error != rvlNoError) {
+      printf("main(): Could not allocate player object.\n");
+      free(bottomRightPlayer);
+      rvlPlayerFree(me);
+    }
+    connectToServer(argv[1]);
+  } else { /* "Waiting" player. */
+    error = rvlPlayerNewH(&me, topLeftPlayer, 5, 5, 10);
+    if (error != rvlNoError) {
+      printf("main(): Could not allocate player object.\n");
+      free(topLeftPlayer);
+      free(bottomRightPlayer);
+      return EXIT_FAILURE;
+    }
+    error = rvlPlayerNewH(&rival, bottomRightPlayer, 5, 5, 10);
+    if (error != rvlNoError) {
+      printf("main(): Could not allocate player object.\n");
+      rvlPlayerFree(me);
+      free(bottomRightPlayer);
+      return EXIT_FAILURE;
+    }
+    if (startServer() == EXIT_FAILURE)
+      return EXIT_FAILURE;
   }
+  rvlScene *scene;
+  error = rvlSceneNewH(&scene, mapWidth, mapLength);
+  if (error != rvlNoError) {
+    printf("main(): Could not allocate scene object.\n");
+    rvlPlayerFree(me);
+    rvlPlayerFree(rival);
+    return EXIT_FAILURE;
+  }
+  rvlSceneAddPlayer(scene, me); /* E. */
+  rvlSceneAddPlayer(scene, rival);
   printf("[?25l");
   setbuf(stdout, NULL);
   printf("[2J");
@@ -33,10 +82,10 @@ int main(int argc, char **argv)
   oldTerminalSettings.c_lflag &= ~ECHO;
   tcsetattr(STDIN_FILENO, TCSANOW, &oldTerminalSettings);
   int movesLeft;
-  char networkInput, userInput, messageBuffer[100] = {'\0'},
-    map[WIDTH * LENGTH];
-  draw(WIDTH, LENGTH, me, rival);
-  if (me.entity.x == WIDTH - 1 && me.entity.y == LENGTH - 1) {
+  char networkInput, userInput, messageBuffer[100] = {'\0'};
+  /* SegFault. */ draw(scene);
+  /* Figuring out which player this is based on their position. Not great. */
+  if (me->entity->x == scene->width - 1 && me->entity->y == scene->length - 1) {
     goto EndTurn;
   }
   while (true) {
@@ -48,14 +97,15 @@ int main(int argc, char **argv)
         switch (userInput) {
         case 'a':
           if (movesLeft) {
-            if (distance(me, rival) <= 1) {
-              int meHp = me.health, rivalHp = rival.health;
-              attack(&me, &rival);
-              int meLost = me.health - meHp, rivalLost = rivalHp - rival.health;
+            if (distance(me->entity, rival->entity) <= 1) {
+              int meHp = me->health, rivalHp = rival->health;
+              attack(me, rival);
+              int meLost = me->health - meHp,
+                rivalLost = rivalHp - rival->health;
               if (sendMessage('a') == -1) {
                 goto CleanUpAndExitWithError;
               }
-              draw(WIDTH, LENGTH, me, rival);
+              draw(scene);
               movesLeft--;
               addMessage("Attack!");
             } else {
@@ -65,9 +115,9 @@ int main(int argc, char **argv)
           break;
         case 'j':
           if (movesLeft) {
-            if (me.entity.y < LENGTH - 1) {
-              me.entity.y++;
-              draw(WIDTH, LENGTH, me ,rival);
+            if (me->entity->y < scene->length - 1) {
+              me->entity->y++;
+              draw(scene);
               if (sendMessage('j') == -1) {
                 goto CleanUpAndExitWithError;
               }
@@ -77,9 +127,9 @@ int main(int argc, char **argv)
           break;
          case 'k':
           if (movesLeft) {
-            if (me.entity.y > 0) {
-              me.entity.y--;
-              draw(WIDTH, LENGTH, me ,rival);
+            if (me->entity->y > 0) {
+              me->entity->y--;
+              draw(scene);
               if (sendMessage('k') == -1) {
                 goto CleanUpAndExitWithError;
               }
@@ -89,9 +139,9 @@ int main(int argc, char **argv)
           break;      
         case 'l':
 	  if (movesLeft) {
-	    if (me.entity.x < WIDTH - 1) {
-	      me.entity.x++;
-	      draw(WIDTH, LENGTH, me ,rival);
+	    if (me->entity->x < scene->width - 1) {
+	      me->entity->x++;
+	      draw(scene);
 	      if (sendMessage('l') == -1) {
 		goto CleanUpAndExitWithError;
 	      }
@@ -101,9 +151,9 @@ int main(int argc, char **argv)
 	  break;
         case 'h':
           if (movesLeft) {
-            if (me.entity.x > 0) {
-              me.entity.x--;
-              draw(WIDTH, LENGTH, me ,rival);
+            if (me->entity->x > 0) {
+              me->entity->x--;
+              draw(scene);
               if (sendMessage('h') == -1) {
                 goto CleanUpAndExitWithError;
               }
@@ -135,26 +185,26 @@ EndTurn:
       }
       switch (networkInput) {
       case 'a':
-        attack(&me, &rival);
-        draw(WIDTH, LENGTH, me, rival);
+        attack(me, rival);
+        draw(scene);
         addMessage("You have been attacked!");
         drawHelpText(me, false, movesLeft);
         break;
       case 'h':
-        rival.entity.x--;
-        draw(WIDTH, LENGTH, me ,rival);
+        rival->entity->x--;
+        draw(scene);
         break;
       case 'j':
-        rival.entity.y++;
-        draw(WIDTH, LENGTH, me ,rival);
+        rival->entity->y++;
+        draw(scene);
         break;
       case 'k':
-        rival.entity.y--;
-        draw(WIDTH, LENGTH, me ,rival);
+        rival->entity->y--;
+        draw(scene);
         break;
       case 'l':
-        rival.entity.x++;
-        draw(WIDTH, LENGTH, me ,rival);
+        rival->entity->x++;
+        draw(scene);
         break;
       case 'n':
         rivalTurn = false;
