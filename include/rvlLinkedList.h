@@ -17,6 +17,8 @@ typedef struct {
   uint32_t size;
 } rvlLinkedList;
 
+rvlError rvlLinkedListGet(rvlLinkedList *list, int index, void **data);
+
 rvlError rvlLinkedListInsert(rvlLinkedList *list, void *data);
 
 rvlError rvlLinkedListNewH(rvlLinkedList **new);

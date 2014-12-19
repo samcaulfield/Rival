@@ -2,6 +2,16 @@
 
 #include "../include/rvlLinkedList.h"
 
+rvlError rvlLinkedListGet(rvlLinkedList *list, int index, void **data)
+{
+  rvlLinkedNode *node = list->first;
+  uint32_t i = 0;
+  while (i < index)
+    node = node->next;
+  *data = node->data;
+  return rvlNoError;
+}
+
 static rvlError rvlLinkedNodeNewH(rvlLinkedNode **new)
 {
   *new = (rvlLinkedNode *) malloc(sizeof(rvlLinkedNode));
