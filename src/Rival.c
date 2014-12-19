@@ -10,8 +10,101 @@
 #include "../include/rvlScene.h"
 #include "../include/Rendering.h"
 
+struct {
+  char moveUp, moveRight, moveDown, moveLeft, endTurn, attack, quit;
+} keyBindings;
+
+rvlScene *scene;
+rvlPlayer *me, *rival;
+int movesLeft;
+
+typedef enum {
+  EndTurn, ExitOk, ExitError, Nothing
+} action;
+
+action keyPress(char key)
+{
+  if (key == keyBindings.attack) {
+    if (movesLeft) {
+      if (distance(me->entity, rival->entity) <= 1) {
+        int meHp = me->health, rivalHp = rival->health;
+        attack(me, rival);
+	int meLost = me->health - meHp,
+          rivalLost = rivalHp - rival->health;
+	if (sendMessage(keyBindings.attack) == -1)
+	  return ExitError;
+	draw(scene);
+        movesLeft--;
+        addMessage("Attack!");
+      } else {
+        addMessage("Nothing to attack.");
+      }
+    }
+  } else if (key == keyBindings.endTurn) {
+    if (sendMessage(keyBindings.endTurn) == -1)
+      return ExitError;
+    return EndTurn;
+  } else if (key == keyBindings.moveUp) {
+    if (movesLeft) {
+      if (me->entity->y > 0) {
+        me->entity->y--;
+        draw(scene);
+        if (sendMessage(keyBindings.moveUp) == -1)
+          return ExitError;
+        movesLeft--;
+      }
+    }
+  } else if (key == keyBindings.moveLeft) {
+    if (movesLeft) {
+      if (me->entity->x > 0) {
+        me->entity->x--;
+        draw(scene);
+        if (sendMessage(keyBindings.moveLeft) == -1)
+          return ExitError;
+        movesLeft--;
+      }
+    }
+  } else if (key == keyBindings.moveDown) {
+    if (movesLeft) {
+      if (me->entity->y < scene->length - 1) {
+        me->entity->y++;
+        draw(scene);
+        if (sendMessage(keyBindings.moveDown) == -1)
+          return ExitError;
+        movesLeft--;
+      }
+    }
+  } else if (key == keyBindings.moveRight) {
+    if (movesLeft) {
+      if (me->entity->x < scene->width - 1) {
+        me->entity->x++;
+        draw(scene);
+        if (sendMessage(keyBindings.moveRight) == -1)
+          return ExitError;
+        movesLeft--;
+      }
+    }
+  } else if (key == keyBindings.quit) {
+    addMessage("You quit the game. You lose!");
+    drawHelpText(me, true, movesLeft);
+    if (sendMessage(keyBindings.quit) == -1)
+      return ExitError;
+    return ExitOk;
+  }
+  return Nothing;
+}
+
 int main(int argc, char **argv)
 {
+  /* Set up the key bindings. */
+  keyBindings.moveUp = 'k';
+  keyBindings.moveRight = 'l';
+  keyBindings.moveDown = 'j';
+  keyBindings.moveLeft = 'h';
+  keyBindings.endTurn = 'n';
+  keyBindings.attack = 'a';
+  keyBindings.quit = 'q';
+  /* Set up the scene and players. */
   const int mapWidth = 80, mapLength = 40;
   /* Initialise the players. The player who waited for a connection begins in
    * the top left, the other player is in the bottom right. */
@@ -29,7 +122,6 @@ int main(int argc, char **argv)
     free(topLeftPlayer);
     return EXIT_FAILURE;
   }
-  rvlPlayer *me, *rival;
   if (argc == 2) { /* "Connecting" player. */
     error = rvlPlayerNewH(&me, bottomRightPlayer, 5, 5, 10);
     if (error != rvlNoError) {
@@ -63,7 +155,6 @@ int main(int argc, char **argv)
     if (startServer() == EXIT_FAILURE)
       return EXIT_FAILURE;
   }
-  rvlScene *scene;
   error = rvlSceneNewH(&scene, mapWidth, mapLength);
   if (error != rvlNoError) {
     printf("main(): Could not allocate scene object.\n");
@@ -81,7 +172,6 @@ int main(int argc, char **argv)
   tcgetattr(STDIN_FILENO, &oldTerminalSettings);
   oldTerminalSettings.c_lflag &= ~ECHO;
   tcsetattr(STDIN_FILENO, TCSANOW, &oldTerminalSettings);
-  int movesLeft;
   char networkInput, userInput, messageBuffer[100] = {'\0'};
   draw(scene);
   /* Figuring out which player this is based on their position. Not great. */
@@ -94,86 +184,13 @@ int main(int argc, char **argv)
       drawHelpText(me, true, movesLeft);
       userInput = getchar();
       if (userInput != '\n') {
-        switch (userInput) {
-        case 'a':
-          if (movesLeft) {
-            if (distance(me->entity, rival->entity) <= 1) {
-              int meHp = me->health, rivalHp = rival->health;
-              attack(me, rival);
-              int meLost = me->health - meHp,
-                rivalLost = rivalHp - rival->health;
-              if (sendMessage('a') == -1) {
-                goto CleanUpAndExitWithError;
-              }
-              draw(scene);
-              movesLeft--;
-              addMessage("Attack!");
-            } else {
-              addMessage("Nothing to attack.");
-            }
-          }
-          break;
-        case 'j':
-          if (movesLeft) {
-            if (me->entity->y < scene->length - 1) {
-              me->entity->y++;
-              draw(scene);
-              if (sendMessage('j') == -1) {
-                goto CleanUpAndExitWithError;
-              }
-              movesLeft--;
-            }
-          }
-          break;
-         case 'k':
-          if (movesLeft) {
-            if (me->entity->y > 0) {
-              me->entity->y--;
-              draw(scene);
-              if (sendMessage('k') == -1) {
-                goto CleanUpAndExitWithError;
-              }
-              movesLeft--;
-            }
-          }
-          break;      
-        case 'l':
-	  if (movesLeft) {
-	    if (me->entity->x < scene->width - 1) {
-	      me->entity->x++;
-	      draw(scene);
-	      if (sendMessage('l') == -1) {
-		goto CleanUpAndExitWithError;
-	      }
-	      movesLeft--;
-	    }
-	  }
-	  break;
-        case 'h':
-          if (movesLeft) {
-            if (me->entity->x > 0) {
-              me->entity->x--;
-              draw(scene);
-              if (sendMessage('h') == -1) {
-                goto CleanUpAndExitWithError;
-              }
-              movesLeft--;
-            }
-          }
-          break;
-	case 'n':
-	  if (sendMessage('n') == -1) {
-	    goto CleanUpAndExitWithError;
-	  }
-	  goto EndTurn;
-	case 'q':
-          addMessage("You quit the game. You lose!");
-          drawHelpText(me, true, movesLeft);
-	  if (sendMessage('q') == -1) {
-	    goto CleanUpAndExitWithError;
-	  }
-	  goto CleanUpAndExit;
-	}
+        action act = keyPress(userInput);
+        if (act == EndTurn)
+          goto EndTurn;
+        else if (act == ExitOk)
+          goto CleanUpAndExit;
+        else if (act == ExitError)
+          goto CleanUpAndExitWithError;
       }
     }
 EndTurn:
