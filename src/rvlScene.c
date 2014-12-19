@@ -5,12 +5,8 @@
 
 rvlError rvlSceneAddPlayer(rvlScene *scene, rvlPlayer *player)
 {
-  if (scene->players == NULL) {
-    rvlError error;
-    if ((error = rvlLinkedListNewH(&scene->players)) != rvlNoError)
-      return error;
-  }
   rvlLinkedListInsert(scene->players, player);
+  return rvlNoError;
 }
 
 rvlError rvlEntityNewH(rvlEntity **new, int x, int y, bool isCollidable,
@@ -46,6 +42,16 @@ rvlError rvlSceneNewH(rvlScene **new, int width, int length)
     return rvlMemoryAllocationError;
   (*new)->width = width;
   (*new)->length = length;
+  rvlError error;
+  if ((error = rvlLinkedListNewH(&(*new)->players)) != rvlNoError) {
+    free(*new);
+    return error;
+  }
+  if ((error = rvlLinkedListNewH(&(*new)->entities)) != rvlNoError) {
+    free(*new);
+    free((*new)->players);
+    return error;
+  }
   return rvlNoError;
 }
 
