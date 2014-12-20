@@ -4,6 +4,20 @@
 #include "../include/rvlLinkedList.h"
 #include "../include/rvlScene.h"
 
+uint32_t getNearby(rvlScene *scene, rvlEntity *entity)
+{
+  if (scene == NULL || entity == NULL)
+    return 0;
+  uint32_t i = 0, nearby = 0;
+  rvlEntity *scanEntity;
+  for (i; i < scene->entities->size; i++) {
+    rvlLinkedListGet(scene->entities, i, (void **) scanEntity);
+    if (distance(entity, scanEntity) == 1)
+      nearby++;
+  }
+  return nearby;
+}
+
 void addEntity(rvlScene *scene, rvlEntity *entity)
 {
   if (scene == NULL)

@@ -22,6 +22,8 @@ typedef struct {
   rvlLinkedList *entities;
 } rvlScene;
 
+uint32_t getNearby(rvlScene *scene, rvlEntity *entity);
+
 void generateTerrain(rvlScene *scene);
 
 bool canMoveTo(rvlScene *scene, int x, int y);
