@@ -1,7 +1,40 @@
 #include <stdlib.h>
+#include <time.h>
 
 #include "../include/rvlLinkedList.h"
 #include "../include/rvlScene.h"
+
+void generateTerrain(rvlScene *scene)
+{
+  srand(time(NULL)); /* Seed the random generation nondeterministically. */
+  /* The number of entities generated is a function of the size of the map. */
+  int numEntities = scene->length * scene->width / 50, index, x, y, i;
+  bool occupied;
+  rvlEntity *entity, *scanEntity;
+  rvlPlayer *scanPlayer;
+  while (numEntities-- > 0) {
+    index = rand() % (scene->length * scene->width); /* Get a map position. */
+    x = index % scene->width;
+    y = index / scene->width;
+    i = 0;
+    occupied = false;
+    for (i; i < scene->entities->size; i++) { /* Prevent double ups. */
+      rvlLinkedListGet(scene->entities, i, (void **) &scanEntity);
+      if (scanEntity->x == x && scanEntity->y == y)
+        occupied = true;
+    }
+    i = 0;
+    for (i; i < scene->players->size; i++) {
+      rvlLinkedListGet(scene->players, i, (void **) &scanPlayer);
+      if (scanPlayer->entity->x == x && scanPlayer->entity->y == y)
+        occupied = true;
+    }
+    if (!occupied) {
+      rvlEntityNewH(&entity, x, y, true, "\u2660");
+      rvlLinkedListInsert(scene->entities, entity);
+    }
+  }
+}
 
 bool canMoveTo(rvlScene *scene, int x, int y)
 {

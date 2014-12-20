@@ -172,6 +172,7 @@ int main(int argc, char **argv)
   }
   rvlSceneAddPlayer(scene, me); /* E. */
   rvlSceneAddPlayer(scene, rival);
+  generateTerrain(scene);
   printf("[?25l");
   setbuf(stdout, NULL);
   printf("[2J");

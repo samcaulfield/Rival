@@ -23,10 +23,11 @@ void draw(rvlScene *scene)
         }
       }
       if (!printed) {
+        i = 0;
         for (i; i < scene->entities->size; i++) {
-          rvlLinkedListGet(scene->players, i, (void **) &player);
-          if (player->entity->x == x && player->entity->y == y) {
-            printf(player->entity->skin);
+          rvlLinkedListGet(scene->entities, i, (void **) &entity);
+          if (entity->x == x && entity->y == y) {
+            printf(entity->skin);
             printed = true;
           }
         }
