@@ -5,7 +5,7 @@ void draw(rvlScene *scene);
 
 void addMessage(char *message);
 
-void drawHelpText(rvlPlayer *me, bool myTurn, int movesLeft);
+void drawHelpText(rvlEntity *me, bool myTurn, int movesLeft);
 
 #endif
 

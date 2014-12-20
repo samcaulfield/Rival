@@ -8,32 +8,21 @@ void draw(rvlScene *scene)
   printf("[1;1H"); /* Set the cursor position to the top left. */
   int y = 0, x, i;
   bool printed;
-  rvlPlayer *player;
   rvlEntity *entity;
   for (y; y < scene->length; y++) {
     x = 0;
     for (x; x < scene->width; x++) {
       i = 0;
       printed = false;
-      for (i; i < scene->players->size; i++) {
-        rvlLinkedListGet(scene->players, i, (void **) &player);
-        if (player->entity->x == x && player->entity->y == y) {
-          printf(player->entity->skin);
-          printed = true;
-        }
+      for (i; i < scene->entities->size; i++) {
+	rvlLinkedListGet(scene->entities, i, (void **) &entity);
+	if (entity->x == x && entity->y == y) {
+	  printf(entity->skin);
+	  printed = true;
+	}
       }
-      if (!printed) {
-        i = 0;
-        for (i; i < scene->entities->size; i++) {
-          rvlLinkedListGet(scene->entities, i, (void **) &entity);
-          if (entity->x == x && entity->y == y) {
-            printf(entity->skin);
-            printed = true;
-          }
-        }
-        if (!printed)
-          printf(".");
-      }
+      if (!printed)
+	printf(".");
     }
     printf("[E");
   }
@@ -48,7 +37,7 @@ void addMessage(char *message)
   message0 = message;
 }
 
-void drawHelpText(rvlPlayer *me, bool myTurn, int movesLeft)
+void drawHelpText(rvlEntity *me, bool myTurn, int movesLeft)
 {
   printf("[41;1H"); /* Set the cursor position to after the map. */
   printf("[K"); /* Clear out existing text on this line. */

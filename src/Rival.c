@@ -15,7 +15,7 @@ struct {
 } keyBindings;
 
 rvlScene *scene;
-rvlPlayer *me, *rival;
+rvlEntity *me, *rival;
 int movesLeft;
 
 typedef enum {
@@ -26,7 +26,7 @@ action keyPress(char key)
 {
   if (key == keyBindings.attack) {
     if (movesLeft) {
-      if (distance(me->entity, rival->entity) <= 1) {
+      if (distance(me, rival) <= 1) {
         int meHp = me->health, rivalHp = rival->health;
         attack(me, rival);
 	int meLost = me->health - meHp,
@@ -46,9 +46,9 @@ action keyPress(char key)
     return EndTurn;
   } else if (key == keyBindings.moveUp) {
     if (movesLeft) {
-      if (me->entity->y > 0) {
-        if (canMoveTo(scene, me->entity->x, me->entity->y - 1)) {
-	  me->entity->y--;
+      if (me->y > 0) {
+        if (canMoveTo(scene, me->x, me->y - 1)) {
+	  me->y--;
 	  draw(scene);
 	  if (sendMessage(keyBindings.moveUp) == -1)
 	    return ExitError;
@@ -58,9 +58,9 @@ action keyPress(char key)
     }
   } else if (key == keyBindings.moveLeft) {
     if (movesLeft) {
-      if (me->entity->x > 0) {
-        if (canMoveTo(scene, me->entity->x - 1, me->entity->y)) {
-	  me->entity->x--;
+      if (me->x > 0) {
+        if (canMoveTo(scene, me->x - 1, me->y)) {
+	  me->x--;
 	  draw(scene);
 	  if (sendMessage(keyBindings.moveLeft) == -1)
 	    return ExitError;
@@ -70,9 +70,9 @@ action keyPress(char key)
     }
   } else if (key == keyBindings.moveDown) {
     if (movesLeft) {
-      if (me->entity->y < scene->length - 1) {
-        if (canMoveTo(scene, me->entity->x, me->entity->y + 1)) {
-	  me->entity->y++;
+      if (me->y < scene->length - 1) {
+        if (canMoveTo(scene, me->x, me->y + 1)) {
+	  me->y++;
 	  draw(scene);
 	  if (sendMessage(keyBindings.moveDown) == -1)
 	    return ExitError;
@@ -82,9 +82,9 @@ action keyPress(char key)
     }
   } else if (key == keyBindings.moveRight) {
     if (movesLeft) {
-      if (me->entity->x < scene->width - 1) {
-        if (canMoveTo(scene, me->entity->x + 1, me->entity->y)) {
-	  me->entity->x++;
+      if (me->x < scene->width - 1) {
+        if (canMoveTo(scene, me->x + 1, me->y)) {
+	  me->x++;
 	  draw(scene);
 	  if (sendMessage(keyBindings.moveRight) == -1)
 	    return ExitError;
@@ -117,61 +117,22 @@ int main(int argc, char **argv)
   /* Initialise the players. The player who waited for a connection begins in
    * the top left, the other player is in the bottom right. */
   rvlEntity *topLeftPlayer, *bottomRightPlayer;
-  rvlError error;
-  error = rvlEntityNewH(&topLeftPlayer, 0, 0, true, "\u263b");
-  if (error != rvlNoError) {
-    printf("main(): Could not allocate player object.\n");
-    return EXIT_FAILURE;
-  }
-  error = rvlEntityNewH(&bottomRightPlayer, mapWidth - 1, mapLength - 1, true,
-    "\u263a");
-  if (error != rvlNoError) {
-    printf("main(): Could not allocate player object.\n");
-    free(topLeftPlayer);
-    return EXIT_FAILURE;
-  }
+  rvlEntityNewH(&topLeftPlayer, 0, 0, true, "\u263b", 5, 5, 10, Player);
+  rvlEntityNewH(&bottomRightPlayer, mapWidth - 1, mapLength - 1, true,
+    "\u263a", 5, 5, 10, Player);
   if (argc == 2) { /* "Connecting" player. */
-    error = rvlPlayerNewH(&me, bottomRightPlayer, 5, 5, 10);
-    if (error != rvlNoError) {
-      printf("main(): Could not allocate player object.\n");
-      free(topLeftPlayer);
-      free(bottomRightPlayer);
-      return EXIT_FAILURE;
-    }
-    error = rvlPlayerNewH(&rival, topLeftPlayer, 5, 5, 10);
-    if (error != rvlNoError) {
-      printf("main(): Could not allocate player object.\n");
-      free(bottomRightPlayer);
-      rvlPlayerFree(me);
-    }
+    me = bottomRightPlayer;
+    rival = topLeftPlayer;
     connectToServer(argv[1]);
   } else { /* "Waiting" player. */
-    error = rvlPlayerNewH(&me, topLeftPlayer, 5, 5, 10);
-    if (error != rvlNoError) {
-      printf("main(): Could not allocate player object.\n");
-      free(topLeftPlayer);
-      free(bottomRightPlayer);
-      return EXIT_FAILURE;
-    }
-    error = rvlPlayerNewH(&rival, bottomRightPlayer, 5, 5, 10);
-    if (error != rvlNoError) {
-      printf("main(): Could not allocate player object.\n");
-      rvlPlayerFree(me);
-      free(bottomRightPlayer);
-      return EXIT_FAILURE;
-    }
+    me = topLeftPlayer;
+    rival = bottomRightPlayer;
     if (startServer() == EXIT_FAILURE)
       return EXIT_FAILURE;
   }
-  error = rvlSceneNewH(&scene, mapWidth, mapLength);
-  if (error != rvlNoError) {
-    printf("main(): Could not allocate scene object.\n");
-    rvlPlayerFree(me);
-    rvlPlayerFree(rival);
-    return EXIT_FAILURE;
-  }
-  rvlSceneAddPlayer(scene, me); /* E. */
-  rvlSceneAddPlayer(scene, rival);
+  rvlSceneNewH(&scene, mapWidth, mapLength);
+  addEntity(scene, me);
+  addEntity(scene, rival);
   generateTerrain(scene);
   printf("[?25l");
   setbuf(stdout, NULL);
@@ -184,7 +145,7 @@ int main(int argc, char **argv)
   char networkInput, userInput, messageBuffer[100] = {'\0'};
   draw(scene);
   /* Figuring out which player this is based on their position. Not great. */
-  if (me->entity->x == scene->width - 1 && me->entity->y == scene->length - 1) {
+  if (me->x == scene->width - 1 && me->y == scene->length - 1) {
     goto EndTurn;
   }
   while (true) {
@@ -217,19 +178,19 @@ EndTurn:
         drawHelpText(me, false, movesLeft);
         break;
       case 'h':
-        rival->entity->x--;
+        rival->x--;
         draw(scene);
         break;
       case 'j':
-        rival->entity->y++;
+        rival->y++;
         draw(scene);
         break;
       case 'k':
-        rival->entity->y--;
+        rival->y--;
         draw(scene);
         break;
       case 'l':
-        rival->entity->x++;
+        rival->x++;
         draw(scene);
         break;
       case 'n':

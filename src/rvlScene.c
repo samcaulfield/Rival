@@ -4,6 +4,13 @@
 #include "../include/rvlLinkedList.h"
 #include "../include/rvlScene.h"
 
+void addEntity(rvlScene *scene, rvlEntity *entity)
+{
+  if (scene == NULL)
+    return;
+  rvlLinkedListInsert(scene->entities, entity);
+}
+
 void generateTerrain(rvlScene *scene)
 {
   srand(time(NULL)); /* Seed the random generation nondeterministically. */
@@ -11,7 +18,6 @@ void generateTerrain(rvlScene *scene)
   int numEntities = scene->length * scene->width / 50, index, x, y, i;
   bool occupied;
   rvlEntity *entity, *scanEntity;
-  rvlPlayer *scanPlayer;
   while (numEntities-- > 0) {
     index = rand() % (scene->length * scene->width); /* Get a map position. */
     x = index % scene->width;
@@ -23,14 +29,8 @@ void generateTerrain(rvlScene *scene)
       if (scanEntity->x == x && scanEntity->y == y)
         occupied = true;
     }
-    i = 0;
-    for (i; i < scene->players->size; i++) {
-      rvlLinkedListGet(scene->players, i, (void **) &scanPlayer);
-      if (scanPlayer->entity->x == x && scanPlayer->entity->y == y)
-        occupied = true;
-    }
     if (!occupied) {
-      rvlEntityNewH(&entity, x, y, true, "\u2660");
+      rvlEntityNewH(&entity, x, y, true, "\u2660", 0, 1, 10, Tree);
       rvlLinkedListInsert(scene->entities, entity);
     }
   }
@@ -40,13 +40,7 @@ bool canMoveTo(rvlScene *scene, int x, int y)
 {
   if (scene == NULL)
     return false;
-  rvlPlayer *player;
   uint32_t i = 0;
-  for (i; i < scene->players->size; i++) {
-    rvlLinkedListGet(scene->players, i, (void **) &player);
-    if (player->entity->x == x && player->entity->y == y)
-      return false;
-  }
   rvlEntity *entity;
   i = 0;
   for (i; i < scene->entities->size; i++) {
@@ -57,14 +51,8 @@ bool canMoveTo(rvlScene *scene, int x, int y)
   return true;
 }
 
-rvlError rvlSceneAddPlayer(rvlScene *scene, rvlPlayer *player)
-{
-  rvlLinkedListInsert(scene->players, player);
-  return rvlNoError;
-}
-
 rvlError rvlEntityNewH(rvlEntity **new, int x, int y, bool isCollidable,
-  char *skin)
+  char *skin, int attack, int defence, int health, EntityType type)
 {
   *new = (rvlEntity *) malloc(sizeof(rvlEntity));
   if (*new == NULL)
@@ -73,19 +61,10 @@ rvlError rvlEntityNewH(rvlEntity **new, int x, int y, bool isCollidable,
   (*new)->y = y;
   (*new)->isCollidable = isCollidable;
   (*new)->skin = skin;
-  return rvlNoError;
-}
-
-rvlError rvlPlayerNewH(rvlPlayer **new, rvlEntity *entity, int attack,
-  int defence, int health)
-{
-  *new = (rvlPlayer *) malloc(sizeof(rvlPlayer));
-  if (*new == NULL)
-    return rvlMemoryAllocationError;
-  (*new)->entity = entity;
   (*new)->attack = attack;
   (*new)->defence = defence;
   (*new)->health = health;
+  (*new)->type = type;
   return rvlNoError;
 }
 
@@ -97,25 +76,14 @@ rvlError rvlSceneNewH(rvlScene **new, int width, int length)
   (*new)->width = width;
   (*new)->length = length;
   rvlError error;
-  if ((error = rvlLinkedListNewH(&(*new)->players)) != rvlNoError) {
-    free(*new);
-    return error;
-  }
   if ((error = rvlLinkedListNewH(&(*new)->entities)) != rvlNoError) {
     free(*new);
-    free((*new)->players);
     return error;
   }
   return rvlNoError;
 }
 
-rvlError rvlPlayerFree(rvlPlayer *player)
-{
-  free(player->entity);
-  free(player);
-}
-
-void attack(rvlPlayer *a, rvlPlayer *b)
+void attack(rvlEntity *a, rvlEntity *b)
 {
   int aStrength = a->attack - b->defence;
   aStrength = (aStrength < 0) ? 0 : aStrength;

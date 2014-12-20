@@ -5,43 +5,35 @@
 
 #include "rvlLinkedList.h"
 
+typedef enum {
+  Player, Tree
+} EntityType;
+
 typedef struct {
   int x, y;
   bool isCollidable;
   char *skin;
-} rvlEntity;
-
-typedef struct {
-  rvlEntity *entity;
   int attack, defence, health;
-} rvlPlayer;
+  EntityType type;
+} rvlEntity;
 
 typedef struct {
   int width, length;
   rvlLinkedList *entities;
-  rvlLinkedList *players;
 } rvlScene;
 
 void generateTerrain(rvlScene *scene);
 
 bool canMoveTo(rvlScene *scene, int x, int y);
 
-rvlEntity rvlEntityNew(int x, int y, bool isCollidable, char *skin);
-rvlPlayer rvlPlayerNew(rvlEntity entity, int attack, int defence, int health);
+void addEntity(rvlScene *scene, rvlEntity *entity);
 
 rvlError rvlEntityNewH(rvlEntity **new, int x, int y, bool isCollidable,
-  char *skin);
-
-rvlError rvlPlayerNewH(rvlPlayer **new, rvlEntity *entity, int attack,
-  int defence, int health);
+  char *skin, int attack, int defence, int health, EntityType type);
 
 rvlError rvlSceneNewH(rvlScene **new, int width, int length);
 
-rvlError rvlPlayerFree(rvlPlayer *player);
-
-rvlError rvlSceneAddPlayer(rvlScene *scene, rvlPlayer *player);
-
-void attack(rvlPlayer *a, rvlPlayer *b);
+void attack(rvlEntity *a, rvlEntity *b);
 
 int distance(rvlEntity *a, rvlEntity *b);
 
