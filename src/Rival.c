@@ -117,9 +117,9 @@ int main(int argc, char **argv)
   /* Initialise the players. The player who waited for a connection begins in
    * the top left, the other player is in the bottom right. */
   rvlEntity *topLeftPlayer, *bottomRightPlayer;
-  rvlEntityNewH(&topLeftPlayer, 0, 0, true, "\u263b", 5, 5, 10, Player);
+  rvlEntityNewH(&topLeftPlayer, 0, 0, true, "\u263b", 5, 5, 10, Player, true);
   rvlEntityNewH(&bottomRightPlayer, mapWidth - 1, mapLength - 1, true,
-    "\u263a", 5, 5, 10, Player);
+    "\u263a", 5, 5, 10, Player, false);
   if (argc == 2) { /* "Connecting" player. */
     me = bottomRightPlayer;
     rival = topLeftPlayer;

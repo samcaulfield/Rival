@@ -15,6 +15,7 @@ typedef struct {
   char *skin;
   int attack, defence, health;
   EntityType type;
+  bool isCurrentPlayer;
 } rvlEntity;
 
 typedef struct {
@@ -26,6 +27,8 @@ rvlEntity *rvlSceneGetEntity(rvlScene *s, uint32_t index);
 
 uint32_t rvlSceneGetNumEntities(rvlScene *s);
 
+rvlEntity *rvlSceneCurrentPlayer(rvlScene *s);
+
 uint32_t getNearby(rvlScene *scene, rvlEntity *entity);
 
 void generateTerrain(rvlScene *scene);
@@ -35,7 +38,8 @@ bool canMoveTo(rvlScene *scene, int x, int y);
 void addEntity(rvlScene *scene, rvlEntity *entity);
 
 rvlError rvlEntityNewH(rvlEntity **new, int x, int y, bool isCollidable,
-  char *skin, int attack, int defence, int health, EntityType type);
+  char *skin, int attack, int defence, int health, EntityType type,
+  bool isCurrentPlayer);
 
 rvlError rvlSceneNewH(rvlScene **new, int width, int length);
 

@@ -20,6 +20,17 @@ uint32_t rvlSceneGetNumEntities(rvlScene *s)
   return s->entities->size;
 }
 
+rvlEntity *rvlSceneCurrentPlayer(rvlScene *s)
+{
+  rvlEntity *e;
+  uint32_t i = 0;
+  for (i; i < rvlSceneGetNumEntities(s); i++) {
+    e = rvlSceneGetEntity(s, i);
+    if (e->isCurrentPlayer)
+      return e;
+  }
+}
+
 uint32_t getNearby(rvlScene *scene, rvlEntity *entity)
 {
   if (scene == NULL || entity == NULL)
@@ -60,7 +71,7 @@ void generateTerrain(rvlScene *scene)
         occupied = true;
     }
     if (!occupied) {
-      rvlEntityNewH(&entity, x, y, true, "\u2660", 0, 1, 10, Tree);
+      rvlEntityNewH(&entity, x, y, true, "\u2660", 0, 1, 10, Tree, false);
       rvlLinkedListInsert(scene->entities, entity);
     }
   }
@@ -82,7 +93,8 @@ bool canMoveTo(rvlScene *scene, int x, int y)
 }
 
 rvlError rvlEntityNewH(rvlEntity **new, int x, int y, bool isCollidable,
-  char *skin, int attack, int defence, int health, EntityType type)
+  char *skin, int attack, int defence, int health, EntityType type,
+  bool isCurrentPlayer)
 {
   *new = (rvlEntity *) malloc(sizeof(rvlEntity));
   if (*new == NULL)
@@ -95,6 +107,7 @@ rvlError rvlEntityNewH(rvlEntity **new, int x, int y, bool isCollidable,
   (*new)->defence = defence;
   (*new)->health = health;
   (*new)->type = type;
+  (*new)->isCurrentPlayer = isCurrentPlayer;
   return rvlNoError;
 }
 
