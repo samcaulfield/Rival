@@ -4,6 +4,22 @@
 #include "../include/rvlLinkedList.h"
 #include "../include/rvlScene.h"
 
+rvlEntity *rvlSceneGetEntity(rvlScene *s, uint32_t index)
+{
+  if (s == NULL || index >= rvlSceneGetNumEntities(s))
+    return NULL;
+  rvlEntity *e;
+  rvlLinkedListGet(s->entities, index, (void **) &e);
+  return e;
+}
+
+uint32_t rvlSceneGetNumEntities(rvlScene *s)
+{
+  if (s == NULL)
+    return 0;
+  return s->entities->size;
+}
+
 uint32_t getNearby(rvlScene *scene, rvlEntity *entity)
 {
   if (scene == NULL || entity == NULL)

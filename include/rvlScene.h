@@ -22,6 +22,10 @@ typedef struct {
   rvlLinkedList *entities;
 } rvlScene;
 
+rvlEntity *rvlSceneGetEntity(rvlScene *s, uint32_t index);
+
+uint32_t rvlSceneGetNumEntities(rvlScene *s);
+
 uint32_t getNearby(rvlScene *scene, rvlEntity *entity);
 
 void generateTerrain(rvlScene *scene);
