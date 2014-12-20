@@ -22,6 +22,8 @@ typedef struct {
   rvlLinkedList *players;
 } rvlScene;
 
+bool canMoveTo(rvlScene *scene, int x, int y);
+
 rvlEntity rvlEntityNew(int x, int y, bool isCollidable, char *skin);
 rvlPlayer rvlPlayerNew(rvlEntity entity, int attack, int defence, int health);
 

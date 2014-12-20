@@ -3,6 +3,27 @@
 #include "../include/rvlLinkedList.h"
 #include "../include/rvlScene.h"
 
+bool canMoveTo(rvlScene *scene, int x, int y)
+{
+  if (scene == NULL)
+    return false;
+  rvlPlayer *player;
+  uint32_t i = 0;
+  for (i; i < scene->players->size; i++) {
+    rvlLinkedListGet(scene->players, i, (void **) &player);
+    if (player->entity->x == x && player->entity->y == y)
+      return false;
+  }
+  rvlEntity *entity;
+  i = 0;
+  for (i; i < scene->entities->size; i++) {
+    rvlLinkedListGet(scene->entities, i, (void **) &entity);
+    if (entity->x == x && entity->y == y)
+      return false;
+  }
+  return true;
+}
+
 rvlError rvlSceneAddPlayer(rvlScene *scene, rvlPlayer *player)
 {
   rvlLinkedListInsert(scene->players, player);

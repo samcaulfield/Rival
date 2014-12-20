@@ -47,41 +47,49 @@ action keyPress(char key)
   } else if (key == keyBindings.moveUp) {
     if (movesLeft) {
       if (me->entity->y > 0) {
-        me->entity->y--;
-        draw(scene);
-        if (sendMessage(keyBindings.moveUp) == -1)
-          return ExitError;
-        movesLeft--;
+        if (canMoveTo(scene, me->entity->x, me->entity->y - 1)) {
+	  me->entity->y--;
+	  draw(scene);
+	  if (sendMessage(keyBindings.moveUp) == -1)
+	    return ExitError;
+	  movesLeft--;
+        }
       }
     }
   } else if (key == keyBindings.moveLeft) {
     if (movesLeft) {
       if (me->entity->x > 0) {
-        me->entity->x--;
-        draw(scene);
-        if (sendMessage(keyBindings.moveLeft) == -1)
-          return ExitError;
-        movesLeft--;
+        if (canMoveTo(scene, me->entity->x - 1, me->entity->y)) {
+	  me->entity->x--;
+	  draw(scene);
+	  if (sendMessage(keyBindings.moveLeft) == -1)
+	    return ExitError;
+	  movesLeft--;
+        }
       }
     }
   } else if (key == keyBindings.moveDown) {
     if (movesLeft) {
       if (me->entity->y < scene->length - 1) {
-        me->entity->y++;
-        draw(scene);
-        if (sendMessage(keyBindings.moveDown) == -1)
-          return ExitError;
-        movesLeft--;
+        if (canMoveTo(scene, me->entity->x, me->entity->y + 1)) {
+	  me->entity->y++;
+	  draw(scene);
+	  if (sendMessage(keyBindings.moveDown) == -1)
+	    return ExitError;
+	  movesLeft--;
+        }
       }
     }
   } else if (key == keyBindings.moveRight) {
     if (movesLeft) {
       if (me->entity->x < scene->width - 1) {
-        me->entity->x++;
-        draw(scene);
-        if (sendMessage(keyBindings.moveRight) == -1)
-          return ExitError;
-        movesLeft--;
+        if (canMoveTo(scene, me->entity->x + 1, me->entity->y)) {
+	  me->entity->x++;
+	  draw(scene);
+	  if (sendMessage(keyBindings.moveRight) == -1)
+	    return ExitError;
+	  movesLeft--;
+        }
       }
     }
   } else if (key == keyBindings.quit) {
