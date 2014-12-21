@@ -10,4 +10,6 @@ To do list:
   * Gathering
   * Crafting
   * Weapons
+* Fix issues
+  * Keys pressed during the rival's turn aren't thrown away
 * Unit tests
