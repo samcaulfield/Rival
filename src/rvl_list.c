@@ -34,7 +34,7 @@ void rvl_list_free(rvl_list *list, void (*free_data) (void *))
 void *rvl_list_get(rvl_list *list, uint32_t i)
 {
         rvl_node *node = list->first;
-        while (i-- != 0)
+        while (i--)
                 node = node->next;
         return node->data;
 }
@@ -48,7 +48,7 @@ void rvl_list_insert(rvl_list *list, void *data)
 void rvl_list_remove(rvl_list *list, uint32_t i, void (*free_data) (void *))
 {
         rvl_node *node = list->first, *prev = NULL;
-        while (i-- != 0) {
+        while (i--) {
                 prev = node;
                 node = node->next;
         }
