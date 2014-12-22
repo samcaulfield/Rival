@@ -8,6 +8,7 @@
 #include "rvl_scene.h"
 #include "rvl_skin.h"
 
+#define ATTACK     'a'
 #define END_TURN   'n'
 #define MOVE_DOWN  'j'
 #define MOVE_LEFT  'h'
@@ -16,7 +17,7 @@
 #define QUIT       'q'
 
 typedef enum {
-        ok, error, quit
+        draw, ok, error, loss, quit, win
 } result;
 
 rvl_direction key_to_dir(char key)
@@ -39,8 +40,40 @@ result handle_key(char key, rvl_entity *player, rvl_entity *waiting,
 {
         /* Figure which player is "me" based on who sent the key. */
         rvl_entity *me = (is_user) ? player : waiting;
+        rvl_entity *rival = (is_user) ? waiting : player;
 
         switch (key) {
+        case ATTACK:
+                if (is_user && !rvl_connection_send(ATTACK))
+                        return error;
+                rvl_list *nearby = rvl_scene_nearby(scene, player);
+                if (is_user && rvl_list_size(nearby) == 0) {
+                        rvl_renderer_add(scene, me, "Nothing to attack.");
+                } else if (rvl_list_size(nearby) == 1) {
+                        rvl_entity *target = rvl_list_get(nearby, 0);
+                        uint32_t p_old = player->health, t_old = target->health;
+                        rvl_scene_attack(player, target);
+                        char buffer[80];
+                        sprintf(buffer, "You did %d damage and took %d damage!",
+                                t_old - target->health, p_old - player->health);
+                        /* Suppose combatants are actually the players. */
+                        if (me->health <= 0 && rival->health <= 0)
+                                return draw;
+                        else if (me->health <= 0)
+                                return loss;
+                        else if (rival->health <= 0)
+                                return win;
+                        else if (target->health <= 0) {
+                                uint32_t i = 0;
+                                for (i; i < rvl_scene_size(scene); i++)
+                                        if (target == rvl_scene_get(scene, i))
+                                                rvl_scene_remove(scene, i);
+                        }
+                        rvl_renderer_add(scene, player, buffer);
+                } else {
+                }
+                rvl_list_free(nearby, NULL);
+                break;
         case END_TURN:
                 player->moves = 0;
                 waiting->moves = 5;

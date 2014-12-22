@@ -25,7 +25,8 @@ void rvl_list_free(rvl_list *list, void (*free_data) (void *))
         while (list->first) {
                 temp = list->first;
                 list->first = list->first->next;
-                free_node(temp, free_data);
+                if (free_data)
+                        free_node(temp, free_data);
         }
         free(list);
 }

@@ -4,6 +4,14 @@
 #include "rvl_entity.h"
 #include "rvl_scene.h"
 
+void rvl_scene_attack(rvl_entity *a, rvl_entity *b)
+{
+        int damage = b->attack - a->defence;
+        a->health -= ((damage > 0) ? damage : 0);
+        damage = a->attack - b->defence;
+        b->health -= ((damage > 0) ? damage : 0);
+}
+
 bool rvl_scene_can_move(rvl_scene *scene, int x, int y)
 {
         /* Bounds check. */
@@ -19,6 +27,11 @@ bool rvl_scene_can_move(rvl_scene *scene, int x, int y)
                         return false;
         }
         return true;
+}
+
+uint32_t rvl_scene_distance(rvl_entity *a, rvl_entity *b)
+{
+        return abs(a->x - b->x) + abs(a->y - b->y);
 }
 
 bool rvl_scene_generate(rvl_scene *scene)
@@ -78,6 +91,21 @@ void rvl_scene_move(rvl_scene *scene, rvl_entity *player, rvl_entity *waiting,
         }
         if (!player->moves)
                 waiting->moves = RVL_MOVES;
+}
+
+rvl_list *rvl_scene_nearby(rvl_scene *scene, rvl_entity *entity)
+{
+        rvl_list *nearby = rvl_list_new();
+        if (nearby) {
+                rvl_entity *near;
+                uint32_t i = 0;
+                for (i; i < rvl_scene_size(scene); i++) {
+                        near = rvl_scene_get(scene, i);
+                        if (rvl_scene_distance(entity, near) == 1)
+                                rvl_list_insert(nearby, near);
+                }
+        }
+        return nearby;
 }
 
 rvl_scene *rvl_scene_new(int rows, int columns, rvl_list *list)

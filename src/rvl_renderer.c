@@ -78,6 +78,7 @@ void rvl_renderer_draw(rvl_scene *scene, rvl_entity *me)
         uint32_t m = 0;
         while (m < BUF_SIZE) {
                 cursor_down_next();
+                clear_line();
                 printf("%s", rvl_list_get(msg_buf, m++));
         }
 }
