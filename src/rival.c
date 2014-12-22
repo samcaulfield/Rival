@@ -165,7 +165,11 @@ int main(int argc, char **argv)
         rvl_renderer_clean_up();
         rvl_connection_close();
 
-        printf("%s\n", (r == draw) ? "Draw!" : (r == win) ? "Win!" : "Loss!");
+        switch (r) {
+        case draw: printf("Draw!\n");
+        case loss: printf("Loss!\n");
+        case win: printf("Win!\n");
+        }
 
         return EXIT_SUCCESS;
 }
