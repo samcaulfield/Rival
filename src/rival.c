@@ -20,6 +20,11 @@ typedef enum {
         draw, ok, error, loss, quit, win
 } result;
 
+static bool is_end_condition(result r)
+{
+        return r == draw || r == error || r == loss || r == quit || r == win;
+}
+
 rvl_direction key_to_dir(char key)
 {
         switch (key) {
@@ -146,19 +151,21 @@ int main(int argc, char **argv)
                 while (running && me->moves) {
                         rvl_renderer_add(scene, me, "It's your move!");                       
                         r = handle_key(getchar(), me, rival, true, scene);
-                        if (r == error || r == quit)
+                        if (is_end_condition(r))
                                 running = false;
                 }
                 while (running && rival->moves) {
                         r = handle_key(rvl_connection_recv(), rival, me, false,
                                     scene);
-                        if (r == error || r == quit)
+                        if (is_end_condition(r))
                                 running = false;
                 }
         }
 
         rvl_renderer_clean_up();
         rvl_connection_close();
+
+        printf("%s\n", (r == draw) ? "Draw!" : (r == win) ? "Win!" : "Loss!");
 
         return EXIT_SUCCESS;
 }
