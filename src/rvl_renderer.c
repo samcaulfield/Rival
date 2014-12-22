@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <termios.h>
 #include <unistd.h>
 
@@ -14,6 +15,24 @@
 #define hide_cursor()        (printf("[?25l"))
 #define show_cursor()        (printf("[?25h"))
 
+#define BUF_SIZE 3
+static rvl_list *msg_buf;
+
+static void add(char *msg)
+{
+        char *new = (char *) malloc(strlen(msg) * sizeof(char));
+        strcpy(new, msg);
+        rvl_list_insert(msg_buf, new);
+        if (rvl_list_size(msg_buf) > BUF_SIZE)
+                rvl_list_remove(msg_buf, BUF_SIZE, free);
+}
+
+void rvl_renderer_add(rvl_scene *scene, rvl_entity *me, char *msg)
+{
+        add(msg);
+        rvl_renderer_draw(scene, me);
+}
+
 void rvl_renderer_clean_up()
 {
         show_cursor();
@@ -24,6 +43,7 @@ void rvl_renderer_clean_up()
         settings.c_lflag |= ECHO;
         tcsetattr(STDIN_FILENO, TCSANOW, &settings);
         set_cursor_pos(1, 1);
+        rvl_list_free(msg_buf, free);
 }
 
 void rvl_renderer_draw(rvl_scene *scene, rvl_entity *me)
@@ -55,9 +75,14 @@ void rvl_renderer_draw(rvl_scene *scene, rvl_entity *me)
         printf("Controls: h,j,k,l: move, n: end turn, q: quit, a: attack");
         printf("  ");
         printf("ATK: %d, DEF: %d, HP: %d", me->attack, me->defence, me->health);
+        uint32_t m = 0;
+        while (m < BUF_SIZE) {
+                cursor_down_next();
+                printf("%s", rvl_list_get(msg_buf, m++));
+        }
 }
 
-void rvl_renderer_init()
+bool rvl_renderer_init()
 {
         setbuf(stdout, NULL);
         hide_cursor();
@@ -67,5 +92,11 @@ void rvl_renderer_init()
         tcgetattr(STDIN_FILENO, &settings);
         settings.c_lflag &= ~ECHO;
         tcsetattr(STDIN_FILENO, TCSANOW, &settings);
+        if ((msg_buf = rvl_list_new()) == NULL)
+                return false;
+        uint32_t i = 0;
+        for (i; i < BUF_SIZE; i++)
+                add("");
+        return true;
 }
 

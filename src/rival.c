@@ -103,13 +103,15 @@ int main(int argc, char **argv)
         me = (client) ? bottom_right : top_left;
         rival = (client) ? top_left : bottom_right;
 
-        rvl_renderer_init();
+        if (!rvl_renderer_init())
+                return EXIT_FAILURE;
         rvl_renderer_draw(scene, me);
 
         result r;
         bool running = true;
         while (running) {
                 while (running && me->moves) {
+                        rvl_renderer_add(scene, me, "It's your move!");                       
                         r = handle_key(getchar(), me, rival, true, scene);
                         if (r == error || r == quit)
                                 running = false;
