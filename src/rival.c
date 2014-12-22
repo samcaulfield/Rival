@@ -19,6 +19,21 @@ typedef enum {
         ok, error, quit
 } result;
 
+rvl_direction key_to_dir(char key)
+{
+        switch (key) {
+        case MOVE_DOWN:
+                return rvl_down;
+        case MOVE_LEFT:
+                return rvl_left;
+        case MOVE_RIGHT:
+                return rvl_right;
+        case MOVE_UP:
+                return rvl_up;
+        }
+        return rvl_none;
+}
+
 result handle_key(char key, rvl_entity *player, rvl_entity *waiting,
         bool is_user, rvl_scene *scene)
 {
@@ -34,30 +49,11 @@ result handle_key(char key, rvl_entity *player, rvl_entity *waiting,
                 rvl_renderer_draw(scene, me);
                 break;
         case MOVE_DOWN:
-                if (rvl_scene_can_move(scene, player->x, player->y + 1))
-                        rvl_scene_move(scene, player, waiting, rvl_down);
-                if (is_user && !rvl_connection_send(MOVE_DOWN))
-                        return error;
-                rvl_renderer_draw(scene, me);
-                break;
         case MOVE_LEFT:
-                if (rvl_scene_can_move(scene, player->x - 1, player->y))
-                        rvl_scene_move(scene, player, waiting, rvl_left);
-                if (is_user && !rvl_connection_send(MOVE_LEFT))
-                        return error;
-                rvl_renderer_draw(scene, me);
-                break;
         case MOVE_RIGHT:
-                if (rvl_scene_can_move(scene, player->x + 1, player->y))
-                        rvl_scene_move(scene, player, waiting, rvl_right);
-                if (is_user && !rvl_connection_send(MOVE_RIGHT))
-                        return error;
-                rvl_renderer_draw(scene, me);
-                break;
         case MOVE_UP:
-                if (rvl_scene_can_move(scene, player->x, player->y - 1))
-                        rvl_scene_move(scene, player, waiting, rvl_up);
-                if (is_user && !rvl_connection_send(MOVE_UP))
+                rvl_scene_move(scene, player, waiting, key_to_dir(key));
+                if (is_user && !rvl_connection_send(key))
                         return error;
                 rvl_renderer_draw(scene, me);
                 break;

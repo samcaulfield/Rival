@@ -52,19 +52,30 @@ void rvl_scene_move(rvl_scene *scene, rvl_entity *player, rvl_entity *waiting,
 {
         switch (dir) {
         case rvl_down:
-                player->y++;
+                if (rvl_scene_can_move(scene, player->x, player->y + 1)) {
+                        player->y++;
+                        player->moves--;
+                }
                 break;
         case rvl_left:
-                player->x--;
+                if (rvl_scene_can_move(scene, player->x - 1, player->y)) {
+                        player->x--;
+                        player->moves--;
+                }
                 break;
         case rvl_right:
-                player->x++;
+                if (rvl_scene_can_move(scene, player->x + 1, player->y)) {
+                        player->x++;
+                        player->moves--;
+                }
                 break;
         case rvl_up:
-                player->y--;
+                if (rvl_scene_can_move(scene, player->x, player->y - 1)) {
+                        player->y--;
+                        player->moves--;
+                }
                 break;
         }
-        player->moves--;
         if (!player->moves)
                 waiting->moves = RVL_MOVES;
 }

@@ -8,7 +8,7 @@
 #define RVL_MOVES 5
 
 typedef enum {
-        rvl_down, rvl_left, rvl_right, rvl_up
+        rvl_down, rvl_left, rvl_none, rvl_right, rvl_up
 } rvl_direction;
 
 typedef struct {
