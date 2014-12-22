@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "rvl_skin.h"
+
 typedef enum {
         rvl_player, rvl_tree
 } rvl_entity_type;
@@ -11,7 +13,7 @@ typedef enum {
 typedef struct {
         uint32_t x, y, moves, attack, defence, health;
         bool is_collidable;
-        char *skin;
+        rvl_skin skin;
         rvl_entity_type type;
 } rvl_entity;
 

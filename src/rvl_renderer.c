@@ -5,6 +5,7 @@
 
 #include "rvl_entity.h"
 #include "rvl_renderer.h"
+#include "rvl_skin.h"
 
 #define cursor_down_next()   (printf("[E"))
 #define clear_screen()       (printf("[2J"))
@@ -44,7 +45,7 @@ void rvl_renderer_draw(rvl_scene *scene, rvl_entity *me)
                                 }
                         }
                         if (!printed)
-                                printf(".");
+                                printf("%s", rvl_skin_bare);
                 }
                 cursor_down_next();
         }

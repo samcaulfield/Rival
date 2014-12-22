@@ -6,6 +6,7 @@
 #include "rvl_list.h"
 #include "rvl_renderer.h"
 #include "rvl_scene.h"
+#include "rvl_skin.h"
 
 #define END_TURN   'n'
 #define MOVE_DOWN  'j'
@@ -80,10 +81,10 @@ int main(int argc, char **argv)
                 return EXIT_FAILURE;
 
         /* The two players. top_left goes first. */
-        rvl_entity *top_left = rvl_entity_new(0, 0, 5, 5, 5, 10, true, "\u263b",
-                rvl_player);
+        rvl_entity *top_left = rvl_entity_new(0, 0, 5, 5, 5, 10, true,
+                rvl_skin_white, rvl_player);
         rvl_entity *bottom_right = rvl_entity_new(scene->columns - 1,
-                scene->rows - 1, 0, 5, 5, 10, true, "\u263a", rvl_player);
+                scene->rows - 1, 0, 5, 5, 10, true, rvl_skin_black, rvl_player);
         if (!top_left || !bottom_right)
                 return EXIT_FAILURE;
 
