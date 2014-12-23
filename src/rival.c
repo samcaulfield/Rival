@@ -52,8 +52,10 @@ result handle_key(char key, rvl_entity *player, rvl_entity *waiting,
                 if (is_user && !rvl_connection_send(ATTACK))
                         return error;
                 rvl_list *nearby = rvl_scene_nearby(scene, player);
-                if (is_user && rvl_list_size(nearby) == 0) {
-                        rvl_renderer_add(scene, me, "Nothing to attack.");
+                if (rvl_list_size(nearby) == 0) {
+                        if (is_user)
+                                rvl_renderer_add(scene, me,
+                                        "Nothing to attack.");
                 } else if (rvl_list_size(nearby) == 1) {
                         rvl_entity *target = rvl_list_get(nearby, 0);
                         uint32_t p_old = player->health, t_old = target->health;
