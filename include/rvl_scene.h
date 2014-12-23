@@ -18,6 +18,8 @@ typedef struct {
 
 #define rvl_scene_add(scene, entity) (rvl_list_insert(scene->entities, entity))
 
+void rvl_scene_action(rvl_scene *s, rvl_entity *player, rvl_entity *waiting);
+
 void rvl_scene_attack(rvl_entity *a, rvl_entity *b);
 
 #define rvl_scene_get(scene, i) (rvl_list_get(scene->entities, i))

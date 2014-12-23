@@ -60,6 +60,7 @@ result handle_key(char key, rvl_entity *player, rvl_entity *waiting,
                         rvl_entity *target = rvl_list_get(nearby, 0);
                         uint32_t p_old = player->health, t_old = target->health;
                         rvl_scene_attack(player, target);
+                        rvl_scene_action(scene, player, waiting);
                         /* Suppose combatants are actually the players. */
                         if (me->health <= 0 && rival->health <= 0)
                                 return draw;
@@ -80,7 +81,8 @@ result handle_key(char key, rvl_entity *player, rvl_entity *waiting,
                                         t_old - target->health,
                                         p_old - player->health);
                                 rvl_renderer_add(scene, player, buffer);
-                        }
+                        } else
+                                rvl_renderer_draw(scene, me);
                 } else {
                 }
                 rvl_list_free(nearby, NULL);

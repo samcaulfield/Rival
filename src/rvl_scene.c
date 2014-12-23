@@ -4,6 +4,13 @@
 #include "rvl_entity.h"
 #include "rvl_scene.h"
 
+void rvl_scene_action(rvl_scene *s, rvl_entity *a, rvl_entity *b)
+{
+        a->moves--;
+        if (!a->moves)
+                b->moves = RVL_MOVES;
+}
+
 void rvl_scene_attack(rvl_entity *a, rvl_entity *b)
 {
         int damage = b->attack - a->defence;
@@ -65,32 +72,23 @@ void rvl_scene_move(rvl_scene *scene, rvl_entity *player, rvl_entity *waiting,
 {
         switch (dir) {
         case rvl_down:
-                if (rvl_scene_can_move(scene, player->x, player->y + 1)) {
+                if (rvl_scene_can_move(scene, player->x, player->y + 1))
                         player->y++;
-                        player->moves--;
-                }
                 break;
         case rvl_left:
-                if (rvl_scene_can_move(scene, player->x - 1, player->y)) {
+                if (rvl_scene_can_move(scene, player->x - 1, player->y))
                         player->x--;
-                        player->moves--;
-                }
                 break;
         case rvl_right:
-                if (rvl_scene_can_move(scene, player->x + 1, player->y)) {
+                if (rvl_scene_can_move(scene, player->x + 1, player->y))
                         player->x++;
-                        player->moves--;
-                }
                 break;
         case rvl_up:
-                if (rvl_scene_can_move(scene, player->x, player->y - 1)) {
+                if (rvl_scene_can_move(scene, player->x, player->y - 1))
                         player->y--;
-                        player->moves--;
-                }
                 break;
         }
-        if (!player->moves)
-                waiting->moves = RVL_MOVES;
+        rvl_scene_action(scene, player, waiting);
 }
 
 rvl_list *rvl_scene_nearby(rvl_scene *scene, rvl_entity *entity)
