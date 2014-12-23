@@ -56,7 +56,15 @@ result do_combat(rvl_scene *scene, rvl_entity *me, rvl_entity *rival,
         else if (rival->health <= 0)
                 return win;
         else if (target->health <= 0) {
-                /* Target died - remove it from the scene. */
+                /* Target died - loot it and remove it. */
+                rvl_entity_add(player, target->inventory);
+                if (is_user) {
+                        char buffer[80];
+                        sprintf(buffer, "Looted %d items.",
+                                rvl_list_size(target->inventory));
+                        rvl_renderer_add(scene, player, buffer);
+                }
+
                 uint32_t j = 0;
                 for (j; j < rvl_scene_size(scene); j++)
                         if (target == rvl_scene_get(scene, j))
