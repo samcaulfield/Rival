@@ -46,6 +46,7 @@ bool rvl_scene_generate(rvl_scene *scene)
         srand(time(NULL));
         bool occupied = false;
         rvl_entity *e, *new;
+        rvl_list *inv;
         int num_entities = scene->rows * scene->columns / 50, x, y, i, index;
         while (num_entities-- > 0) {
                 x = rand() % scene->columns;
@@ -57,8 +58,12 @@ bool rvl_scene_generate(rvl_scene *scene)
                                 occupied = true;
                 }
                 if (!occupied) {
+                        inv = rvl_list_new();
+                        if (!inv)
+                                return false;
+                        rvl_list_insert(inv, rvl_item_new(rvl_wood));
                         new = rvl_entity_new(x, y, 0, 0, 3, 10, true,
-                                rvl_white, rvl_skin_tree, rvl_tree);
+                                rvl_white, rvl_skin_tree, rvl_tree, inv);
                         if (!new)
                                 return false;
                         rvl_scene_add(scene, new);

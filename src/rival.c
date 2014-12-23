@@ -177,10 +177,10 @@ int main(int argc, char **argv)
 
         /* The two players. top_left goes first. */
         rvl_entity *top_left = rvl_entity_new(0, 0, RVL_MOVES, 5, 5, 10, true,
-                rvl_white, rvl_skin_white, rvl_player);
+                rvl_white, rvl_skin_white, rvl_player, NULL);
         rvl_entity *bottom_right = rvl_entity_new(scene->columns - 1,
                 scene->rows - 1, 0, 5, 5, 10, true, rvl_white,
-                rvl_skin_black, rvl_player);
+                rvl_skin_black, rvl_player, NULL);
         if (!top_left || !bottom_right)
                 return EXIT_FAILURE;
 
