@@ -10,6 +10,7 @@
 
 #define ATTACK     'a'
 #define END_TURN   'n'
+#define INVENTORY  'i'
 #define MOVE_DOWN  'j'
 #define MOVE_LEFT  'h'
 #define MOVE_RIGHT 'l'
@@ -159,6 +160,20 @@ result handle_key(char key, rvl_entity *player, rvl_entity *waiting,
                 if (is_user && !rvl_connection_send(END_TURN))
                         return error;
                 rvl_renderer_draw(scene, me);
+                break;
+        case INVENTORY:
+                if (is_user && !rvl_connection_send(INVENTORY))
+                        return error;
+                /* Open the inventory screen. */
+                if (is_user) {
+                        rvl_renderer_inv(scene, me);
+                        char in;
+                        while ((in = (is_user) ? getchar() :
+                                rvl_connection_recv()) != 'i')
+                                if (is_user && !rvl_connection_send(INVENTORY))
+                                        return error;
+                        rvl_renderer_draw(scene, me);
+                }
                 break;
         case MOVE_DOWN:
         case MOVE_LEFT:

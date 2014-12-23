@@ -110,3 +110,16 @@ bool rvl_renderer_init()
         return true;
 }
 
+void rvl_renderer_inv(rvl_scene *scene, rvl_entity *me)
+{
+        clear_screen();
+        set_cursor_pos(1, 1);
+        printf("Inventory:");
+        uint32_t i = 0;
+        for (i; i < rvl_list_size(me->inventory); i++) {
+                cursor_down_next();
+                printf(rvl_item_type_name(
+                        ((rvl_item *) rvl_list_get(me->inventory, i))->type));
+        }
+}
+

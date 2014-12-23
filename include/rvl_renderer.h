@@ -11,5 +11,7 @@ void rvl_renderer_draw(rvl_scene *scene, rvl_entity *me);
 
 bool rvl_renderer_init();
 
+void rvl_renderer_inv(rvl_scene *scene, rvl_entity *me);
+
 #endif
 
