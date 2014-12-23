@@ -40,6 +40,40 @@ rvl_direction key_to_dir(char key)
         return rvl_none;
 }
 
+result do_combat(rvl_scene *scene, rvl_entity *me, rvl_entity *rival,
+        rvl_entity *player, rvl_entity *waiting, rvl_entity *target,
+        bool is_user)
+{
+        uint32_t p_old = player->health, t_old = target->health;
+        rvl_scene_attack(player, target);
+        rvl_scene_action(scene, player, waiting);
+        
+        /* Suppose combatants are actually the players. */
+        if (me->health <= 0 && rival->health <= 0)
+                return draw;
+        else if (me->health <= 0)
+                return loss;
+        else if (rival->health <= 0)
+                return win;
+        else if (target->health <= 0) {
+                /* Target died - remove it from the scene. */
+                uint32_t j = 0;
+                for (j; j < rvl_scene_size(scene); j++)
+                        if (target == rvl_scene_get(scene, j))
+                                rvl_scene_remove(scene, j);
+        }
+
+        /* Print the results to the attacking player. */
+        if (is_user) {
+                char buffer[80];
+                sprintf(buffer, "You did %d damage and took %d damage!",
+                        t_old - target->health, p_old - player->health);
+                        rvl_renderer_add(scene, player, buffer);
+        } else
+                rvl_renderer_draw(scene, me);
+
+}
+
 result handle_key(char key, rvl_entity *player, rvl_entity *waiting,
         bool is_user, rvl_scene *scene)
 {
@@ -57,33 +91,52 @@ result handle_key(char key, rvl_entity *player, rvl_entity *waiting,
                                 rvl_renderer_add(scene, me,
                                         "Nothing to attack.");
                 } else if (rvl_list_size(nearby) == 1) {
-                        rvl_entity *target = rvl_list_get(nearby, 0);
-                        uint32_t p_old = player->health, t_old = target->health;
-                        rvl_scene_attack(player, target);
-                        rvl_scene_action(scene, player, waiting);
-                        /* Suppose combatants are actually the players. */
-                        if (me->health <= 0 && rival->health <= 0)
-                                return draw;
-                        else if (me->health <= 0)
-                                return loss;
-                        else if (rival->health <= 0)
-                                return win;
-                        else if (target->health <= 0) {
-                                uint32_t i = 0;
-                                for (i; i < rvl_scene_size(scene); i++)
-                                        if (target == rvl_scene_get(scene, i))
-                                                rvl_scene_remove(scene, i);
-                        }
-                        if (is_user) {
-                                char buffer[80];
-                                sprintf(buffer,
-                                        "You did %d damage and took %d damage!",
-                                        t_old - target->health,
-                                        p_old - player->health);
-                                rvl_renderer_add(scene, player, buffer);
-                        } else
-                                rvl_renderer_draw(scene, me);
+                        result r = do_combat(scene, me, rival, player, waiting,
+                                rvl_list_get(nearby, 0), is_user);
                 } else {
+                        /* Colour in potential targets. */
+                        rvl_entity *target = rvl_list_get(nearby, 0);
+                        target->colour = rvl_green;
+                        uint32_t i = 1;
+                        for (i; i < rvl_list_size(nearby); i++)
+                                ((rvl_entity *) rvl_list_get(nearby, i))->colour
+                                        = rvl_red;
+                        rvl_renderer_add(scene, player, "Select a target. " \
+                                "Press k to cycle targets, a to attack and " \
+                                "c to exit.");
+                        i = 0;
+                       
+                        /* Target selection loop. */ 
+                        char in = '\0';
+                        do {
+                                in = (is_user) ? getchar() :
+                                        rvl_connection_recv();
+                                if (is_user && !rvl_connection_send(in)) {
+                                        return error;
+                                        rvl_list_free(nearby, NULL);
+                                }
+                                if (in == 'k') {
+                                        i++;
+                                        if (i > rvl_list_size(nearby) - 1)
+                                                i = 0;
+                                        target->colour = rvl_red;
+                                        target = rvl_list_get(nearby, i);
+                                        target->colour = rvl_green;
+                                        rvl_renderer_draw(scene, me);
+                                }
+                        } while (in != 'a' && in != 'c');
+                        i = 0;
+                        if (in == 'a') {
+                                result r = do_combat(scene, me, rival, player,
+                                        waiting, target, is_user);
+                                if (is_end_condition(r))
+                                        return r;
+                        }
+
+                        for (i; i < rvl_list_size(nearby); i++)
+                                ((rvl_entity *) rvl_list_get(nearby, i))->colour
+                                        = rvl_white;
+                        rvl_renderer_draw(scene, me);
                 }
                 rvl_list_free(nearby, NULL);
                 break;
