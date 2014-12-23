@@ -102,18 +102,20 @@ result handle_key(char key, rvl_entity *player, rvl_entity *waiting,
                         result r = do_combat(scene, me, rival, player, waiting,
                                 rvl_list_get(nearby, 0), is_user);
                 } else {
-                        /* Colour in potential targets. */
+                        uint32_t i;
                         rvl_entity *target = rvl_list_get(nearby, 0);
-                        target->colour = rvl_green;
-                        uint32_t i = 1;
-                        for (i; i < rvl_list_size(nearby); i++)
-                                ((rvl_entity *) rvl_list_get(nearby, i))->colour
-                                        = rvl_red;
-                        rvl_renderer_add(scene, player, "Select a target. " \
-                                "Press k to cycle targets, a to attack and " \
-                                "c to exit.");
+                        if (is_user) {
+                                /* Colour in potential targets. */
+                                target->colour = rvl_green;
+                                i = 1;
+                                for (i; i < rvl_list_size(nearby); i++)
+                                        ((rvl_entity *) rvl_list_get(nearby, i))
+                                                ->colour = rvl_red;
+                                rvl_renderer_add(scene, player,
+                                "Select a target. Press k to cycle targets, " \
+                                "a to attack and c to exit.");
+                        }
                         i = 0;
-                       
                         /* Target selection loop. */ 
                         char in = '\0';
                         do {
@@ -127,10 +129,13 @@ result handle_key(char key, rvl_entity *player, rvl_entity *waiting,
                                         i++;
                                         if (i > rvl_list_size(nearby) - 1)
                                                 i = 0;
-                                        target->colour = rvl_red;
+                                        if (is_user)
+                                                target->colour = rvl_red;
                                         target = rvl_list_get(nearby, i);
-                                        target->colour = rvl_green;
-                                        rvl_renderer_draw(scene, me);
+                                        if (is_user) {
+                                                target->colour = rvl_green;
+                                                rvl_renderer_draw(scene, me);
+                                        }
                                 }
                         } while (in != 'a' && in != 'c');
                         i = 0;
