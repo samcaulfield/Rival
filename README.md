@@ -12,4 +12,5 @@ To do list:
   * Weapons
 * Fix issues
   * Keys pressed during the rival's turn aren't thrown away
+  * Terminal colour is set to white after drawing
 * Unit tests
