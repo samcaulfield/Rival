@@ -152,7 +152,7 @@ int main(int argc, char **argv)
         bool running = true;
         while (running) {
                 while (running && me->moves) {
-                        if (me->moves = RVL_MOVES)
+                        if (me->moves == RVL_MOVES)
                                 rvl_renderer_add(scene, me, "It's your move!");                       
                         r = handle_key(getchar(), me, rival, true, scene);
                         if (is_end_condition(r))
