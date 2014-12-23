@@ -51,7 +51,7 @@ bool rvl_scene_generate(rvl_scene *scene)
                 }
                 if (!occupied) {
                         new = rvl_entity_new(x, y, 0, 0, 3, 10, true,
-                                rvl_skin_tree, rvl_tree);
+                                rvl_white, rvl_skin_tree, rvl_tree);
                         if (!new)
                                 return false;
                         rvl_scene_add(scene, new);

@@ -60,7 +60,10 @@ void rvl_renderer_draw(rvl_scene *scene, rvl_entity *me)
                         for (i; i < rvl_scene_size(scene); i++) {
                                 e = rvl_scene_get(scene, i);
                                 if (x == e->x && y == e->y) {
-                                        printf("%s", e->skin);
+                                        printf("%s%s%s",
+                                                rvl_colour_begin(e->colour),
+                                                e->skin,
+                                                rvl_colour_end());
                                         printed = true;
                                 }
                         }
