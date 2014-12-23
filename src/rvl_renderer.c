@@ -78,6 +78,12 @@ void rvl_renderer_draw(rvl_scene *scene, rvl_entity *me)
         printf("Controls: h,j,k,l: move, n: end turn, q: quit, a: attack");
         printf("  ");
         printf("ATK: %d, DEF: %d, HP: %d", me->attack, me->defence, me->health);
+        cursor_down_next();
+        if (!me->moves)
+                printf("%s", rvl_colour_begin(rvl_red));
+        printf("Moves left: %d.", me->moves);
+        if (!me->moves)
+                printf("%s", rvl_colour_end());
         uint32_t m = 0;
         while (m < BUF_SIZE) {
                 cursor_down_next();
