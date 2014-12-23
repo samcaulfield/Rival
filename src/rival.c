@@ -150,7 +150,8 @@ int main(int argc, char **argv)
         bool running = true;
         while (running) {
                 while (running && me->moves) {
-                        rvl_renderer_add(scene, me, "It's your move!");                       
+                        if (me->moves = RVL_MOVES)
+                                rvl_renderer_add(scene, me, "It's your move!");                       
                         r = handle_key(getchar(), me, rival, true, scene);
                         if (is_end_condition(r))
                                 running = false;
