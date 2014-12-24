@@ -5,6 +5,7 @@
 #include <unistd.h>
 
 #include "rvl_entity.h"
+#include "rvl_recipe.h"
 #include "rvl_renderer.h"
 #include "rvl_skin.h"
 
@@ -121,6 +122,30 @@ void rvl_renderer_inv(rvl_scene *scene, rvl_entity *me)
                 cursor_down_next();
                 key = rvl_cdict_i(me->inventory, i);
                 printf("%s %d", key, rvl_cdict_get(me->inventory, key));
+        }
+        set_cursor_pos(21, 1);
+        printf("Crafting:");
+        rvl_list *recipes = rvl_recipe_get();
+        rvl_recipe *recipe;
+        uint32_t j;
+        i = 0;
+next:
+        for (i; i < rvl_list_size(recipes); i++) {
+                recipe = (rvl_recipe *) rvl_list_get(recipes, i);
+                rvl_cdict *ing = recipe->ingredients;
+                j = 0;
+                for (j; j < rvl_cdict_size(ing); j++) {
+                        char *key = rvl_cdict_i(ing, j);
+                        uint32_t val = rvl_cdict_get(ing, key);
+                        uint32_t my_val = rvl_cdict_get(me->inventory, key);
+                        if (my_val < val) {
+                                i++;
+                                goto next;
+                        }
+                                
+                }
+                cursor_down_next();
+                printf("%s", rvl_item_type_name(recipe->result));
         }
 }
 
