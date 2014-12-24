@@ -10,7 +10,8 @@ void rvl_item_free(rvl_item *item)
 char *rvl_item_type_name(rvl_item_type type)
 {
         switch (type) {
-        case rvl_wood: return "Wood";
+        case rvl_item_stone: return "Stone";
+        case rvl_item_wood: return "Wood";
         }
 }
 

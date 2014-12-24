@@ -31,3 +31,23 @@ rvl_entity *rvl_entity_new(uint32_t x, uint32_t y, uint32_t moves,
         return entity;
 }
 
+rvl_entity *rvl_entity_stone(uint32_t x, uint32_t y)
+{
+        rvl_list *inv = rvl_list_new();
+        if (!inv)
+                return NULL;
+        rvl_list_insert(inv, rvl_item_new(rvl_item_stone));
+        return rvl_entity_new(x, y, 0, 0, 4, 10, true, rvl_white,
+                rvl_skin_stone, rvl_stone, inv);
+}
+
+rvl_entity *rvl_entity_tree(uint32_t x, uint32_t y)
+{
+        rvl_list *inv = rvl_list_new();
+        if (!inv)
+                return NULL;
+        rvl_list_insert(inv, rvl_item_new(rvl_item_wood));
+        return rvl_entity_new(x, y, 0, 0, 3, 10, true, rvl_white,
+                rvl_skin_tree, rvl_tree, inv);
+}
+

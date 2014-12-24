@@ -58,15 +58,11 @@ bool rvl_scene_generate(rvl_scene *scene)
                                 occupied = true;
                 }
                 if (!occupied) {
-                        inv = rvl_list_new();
-                        if (!inv)
-                                return false;
-                        rvl_list_insert(inv, rvl_item_new(rvl_wood));
-                        new = rvl_entity_new(x, y, 0, 0, 3, 10, true,
-                                rvl_white, rvl_skin_tree, rvl_tree, inv);
-                        if (!new)
-                                return false;
-                        rvl_scene_add(scene, new);
+                        int r = rand() % 30;
+                        if (r < 10)
+                                rvl_scene_add(scene, rvl_entity_stone(x, y));
+                        else
+                                rvl_scene_add(scene, rvl_entity_tree(x, y));
                 }
         }
         return true;
