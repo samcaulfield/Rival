@@ -62,7 +62,7 @@ result do_combat(rvl_scene *scene, rvl_entity *me, rvl_entity *rival,
                 if (is_user) {
                         char buffer[80];
                         sprintf(buffer, "Looted %d items.",
-                                rvl_list_size(target->inventory));
+                                rvl_cdict_size(target->inventory));
                         rvl_renderer_add(scene, player, buffer);
                 }
 

@@ -116,10 +116,11 @@ void rvl_renderer_inv(rvl_scene *scene, rvl_entity *me)
         set_cursor_pos(1, 1);
         printf("Inventory:");
         uint32_t i = 0;
-        for (i; i < rvl_list_size(me->inventory); i++) {
+        char *key;
+        for (i; i < rvl_cdict_size(me->inventory); i++) {
                 cursor_down_next();
-                printf(rvl_item_type_name(
-                        ((rvl_item *) rvl_list_get(me->inventory, i))->type));
+                key = rvl_cdict_i(me->inventory, i);
+                printf("%s %d", key, rvl_cdict_get(me->inventory, key));
         }
 }
 
