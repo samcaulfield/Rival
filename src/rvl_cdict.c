@@ -28,9 +28,9 @@ void rvl_cdict_free(rvl_cdict *dict)
 uint32_t rvl_cdict_get(rvl_cdict *dict, char *key)
 {
         rvl_cnode *node = dict->first;
-        while (strcmp(node->key, key))
+        while (node && strcmp(node->key, key))
                 node = node->next;
-        return node->count;
+        return (node) ? node->count : 0;
 }
 
 char *rvl_cdict_i(rvl_cdict *dict, uint32_t i)
