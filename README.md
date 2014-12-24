@@ -7,7 +7,6 @@ Target environment: Linux console.
 
 To do list:
 * Improve the game
-  * Gathering
   * Crafting
   * Weapons
 * Fix issues
