@@ -25,6 +25,16 @@ void rvl_cdict_free(rvl_cdict *dict)
         free(dict);
 }
 
+void rvl_cdict_dec(rvl_cdict *dict, char *key)
+{
+        rvl_cnode *node = dict->first;
+        while (strcmp(node->key, key))
+                node = node->next;
+        node->count--;
+        if (node->count == 0)
+                rvl_cdict_remove(dict, key);
+}
+
 uint32_t rvl_cdict_get(rvl_cdict *dict, char *key)
 {
         rvl_cnode *node = dict->first;
@@ -56,10 +66,22 @@ void rvl_cdict_insert(rvl_cdict *dict, char *key)
         }
 }
 
+void rvl_cdict_less(rvl_cdict *a, rvl_cdict *b)
+{
+        char *key;
+        uint32_t i = 0, val;
+        for (i; i < rvl_cdict_size(b); i++) {
+                key = rvl_cdict_i(b, i);
+                val = rvl_cdict_get(b, key);
+                while (val--)
+                        rvl_cdict_dec(a, key);
+        }
+}
+
 void rvl_cdict_remove(rvl_cdict *dict, char *key)
 {
         rvl_cnode *node = dict->first, *prev = NULL;
-        while (!strcmp(key, node->key)) {
+        while (strcmp(key, node->key)) {
                 prev = node;
                 node = node->next;
         }
