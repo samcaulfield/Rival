@@ -166,12 +166,14 @@ result handle_key(char key, rvl_entity *player, rvl_entity *waiting,
                         return error;
                 /* Open the inventory screen. */
                 if (is_user) {
-                        rvl_renderer_inv(scene, me);
+                        rvl_renderer_set_mode(rvl_renderer_mode_inv);
+                        rvl_renderer_draw(scene, me);
                         char in;
                         while ((in = (is_user) ? getchar() :
                                 rvl_connection_recv()) != 'i')
                                 if (is_user && !rvl_connection_send(INVENTORY))
                                         return error;
+                        rvl_renderer_set_mode(rvl_renderer_mode_game);
                         rvl_renderer_draw(scene, me);
                 }
                 break;

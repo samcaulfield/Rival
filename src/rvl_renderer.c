@@ -9,6 +9,8 @@
 #include "rvl_renderer.h"
 #include "rvl_skin.h"
 
+static rvl_renderer_mode mode;
+
 #define cursor_down_next()   (printf("[E"))
 #define clear_screen()       (printf("[2J"))
 #define clear_line()         (printf("[K"))
@@ -28,26 +30,7 @@ static void add(char *msg)
                 rvl_list_remove(msg_buf, BUF_SIZE, free);
 }
 
-void rvl_renderer_add(rvl_scene *scene, rvl_entity *me, char *msg)
-{
-        add(msg);
-        rvl_renderer_draw(scene, me);
-}
-
-void rvl_renderer_clean_up()
-{
-        show_cursor();
-        clear_screen();
-        system("/bin/stty cooked");
-        struct termios settings;
-        tcgetattr(STDIN_FILENO, &settings);
-        settings.c_lflag |= ECHO;
-        tcsetattr(STDIN_FILENO, TCSANOW, &settings);
-        set_cursor_pos(1, 1);
-        rvl_list_free(msg_buf, free);
-}
-
-void rvl_renderer_draw(rvl_scene *scene, rvl_entity *me)
+static void game(rvl_scene *scene, rvl_entity *me)
 {
         set_cursor_pos(1, 1);
         bool printed = false;
@@ -93,25 +76,7 @@ void rvl_renderer_draw(rvl_scene *scene, rvl_entity *me)
         }
 }
 
-bool rvl_renderer_init()
-{
-        setbuf(stdout, NULL);
-        hide_cursor();
-        clear_screen();
-        system("/bin/stty raw");
-        struct termios settings;
-        tcgetattr(STDIN_FILENO, &settings);
-        settings.c_lflag &= ~ECHO;
-        tcsetattr(STDIN_FILENO, TCSANOW, &settings);
-        if ((msg_buf = rvl_list_new()) == NULL)
-                return false;
-        uint32_t i = 0;
-        for (i; i < BUF_SIZE; i++)
-                add("");
-        return true;
-}
-
-void rvl_renderer_inv(rvl_scene *scene, rvl_entity *me)
+static void inv(rvl_scene *scene, rvl_entity *me)
 {
         clear_screen();
         set_cursor_pos(1, 1);
@@ -147,5 +112,60 @@ next:
                 cursor_down_next();
                 printf("%s", rvl_item_type_name(recipe->result));
         }
+}
+
+void rvl_renderer_add(rvl_scene *scene, rvl_entity *me, char *msg)
+{
+        add(msg);
+        rvl_renderer_draw(scene, me);
+}
+
+void rvl_renderer_clean_up()
+{
+        show_cursor();
+        clear_screen();
+        system("/bin/stty cooked");
+        struct termios settings;
+        tcgetattr(STDIN_FILENO, &settings);
+        settings.c_lflag |= ECHO;
+        tcsetattr(STDIN_FILENO, TCSANOW, &settings);
+        set_cursor_pos(1, 1);
+        rvl_list_free(msg_buf, free);
+}
+
+void rvl_renderer_draw(rvl_scene *scene, rvl_entity *me)
+{
+        switch (mode) {
+        case rvl_renderer_mode_game:
+                game(scene, me);
+                break;
+        case rvl_renderer_mode_inv:
+                inv(scene, me);
+                break;
+        }
+}
+
+bool rvl_renderer_init()
+{
+        setbuf(stdout, NULL);
+        hide_cursor();
+        clear_screen();
+        system("/bin/stty raw");
+        struct termios settings;
+        tcgetattr(STDIN_FILENO, &settings);
+        settings.c_lflag &= ~ECHO;
+        tcsetattr(STDIN_FILENO, TCSANOW, &settings);
+        if ((msg_buf = rvl_list_new()) == NULL)
+                return false;
+        uint32_t i = 0;
+        for (i; i < BUF_SIZE; i++)
+                add("");
+        mode = rvl_renderer_mode_game;
+        return true;
+}
+
+void rvl_renderer_set_mode(rvl_renderer_mode new_mode)
+{
+      mode = new_mode;
 }
 
