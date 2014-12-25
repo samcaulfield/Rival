@@ -15,6 +15,8 @@ void rvl_renderer_draw(rvl_scene *scene, rvl_entity *me);
 
 bool rvl_renderer_init();
 
+void *rvl_renderer_key(char key);
+
 void rvl_renderer_set_mode(rvl_renderer_mode new_mode);
 
 #endif

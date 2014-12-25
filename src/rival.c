@@ -4,6 +4,7 @@
 #include "rvl_connection.h"
 #include "rvl_entity.h"
 #include "rvl_list.h"
+#include "rvl_recipe.h"
 #include "rvl_renderer.h"
 #include "rvl_scene.h"
 #include "rvl_skin.h"
@@ -170,9 +171,16 @@ result handle_key(char key, rvl_entity *player, rvl_entity *waiting,
                         rvl_renderer_draw(scene, me);
                         char in;
                         while ((in = (is_user) ? getchar() :
-                                rvl_connection_recv()) != 'i')
+                                rvl_connection_recv()) != 'i') {
                                 if (is_user && !rvl_connection_send(INVENTORY))
                                         return error;
+                                rvl_recipe *r =
+                                        (rvl_recipe *) rvl_renderer_key(in);
+                                rvl_cdict_less(player->inventory,
+                                        r->ingredients);
+                                rvl_cdict_insert(player->inventory,
+                                        rvl_item_type_name(r->result));
+                        }
                         rvl_renderer_set_mode(rvl_renderer_mode_game);
                         rvl_renderer_draw(scene, me);
                 }

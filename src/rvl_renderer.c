@@ -76,6 +76,9 @@ static void game(rvl_scene *scene, rvl_entity *me)
         }
 }
 
+static rvl_list *craftable = NULL;
+static uint32_t inv_select = 0;
+
 static void inv(rvl_scene *scene, rvl_entity *me)
 {
         clear_screen();
@@ -90,13 +93,19 @@ static void inv(rvl_scene *scene, rvl_entity *me)
         }
         set_cursor_pos(21, 1);
         printf("Crafting:");
-        rvl_list *recipes = rvl_recipe_craftable(me->inventory);
+        craftable = rvl_recipe_craftable(me->inventory);
+        if (inv_select >= rvl_list_size(craftable))
+                inv_select = 0;
         i = 0;
-        for (i; i < rvl_list_size(recipes); i++) {
+        for (i; i < rvl_list_size(craftable); i++) {
                 cursor_down_next();
+                if (i == inv_select)
+                        printf("%s", rvl_colour_begin(rvl_green));
                 printf("%s", rvl_item_type_name(
                         ((rvl_item_type) (((rvl_recipe *) 
-                                rvl_list_get(recipes, i))->result))));
+                                rvl_list_get(craftable, i))->result))));
+                if (i == inv_select)
+                        printf("%s", rvl_colour_end());
         }
 }
 
@@ -148,6 +157,21 @@ bool rvl_renderer_init()
                 add("");
         mode = rvl_renderer_mode_game;
         return true;
+}
+
+void *rvl_renderer_key(char key)
+{
+        switch (mode) {
+        case rvl_renderer_mode_inv:
+                switch (key) {
+                case 'c':
+                        if (craftable)
+                                return rvl_list_get(craftable, inv_select);
+                        break;
+                }
+                break;
+        }
+        return NULL;
 }
 
 void rvl_renderer_set_mode(rvl_renderer_mode new_mode)

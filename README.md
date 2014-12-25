@@ -7,7 +7,6 @@ Target environment: Linux console.
 
 To do list:
 * Improve the game
-  * Crafting
   * Weapons
 * Fix issues
   * Keys pressed during the rival's turn aren't thrown away

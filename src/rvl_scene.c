@@ -47,7 +47,7 @@ bool rvl_scene_generate(rvl_scene *scene)
         bool occupied = false;
         rvl_entity *e, *new;
         rvl_list *inv;
-        int num_entities = scene->rows * scene->columns / 50, x, y, i, index;
+        int num_entities = scene->rows * scene->columns, x, y, i, index;
         while (num_entities-- > 0) {
                 x = rand() % scene->columns;
                 y = rand() % scene->rows;
@@ -59,7 +59,7 @@ bool rvl_scene_generate(rvl_scene *scene)
                 }
                 if (!occupied) {
                         int r = rand() % 30;
-                        if (r < 10)
+                        if (r < 6)
                                 rvl_scene_add(scene, rvl_entity_stone(x, y));
                         else
                                 rvl_scene_add(scene, rvl_entity_tree(x, y));
