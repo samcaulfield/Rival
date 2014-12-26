@@ -6,9 +6,9 @@
 #include "rvl_list.h"
 
 typedef struct {
-        rvl_item_type result;
-        uint32_t count;
-        rvl_cdict *ingredients;
+	rvl_item_type result;
+	uint32_t count;
+	rvl_cdict *ingredients;
 } rvl_recipe;
 
 rvl_list *rvl_recipe_craftable(rvl_cdict *items);
@@ -16,7 +16,7 @@ rvl_list *rvl_recipe_craftable(rvl_cdict *items);
 rvl_list *rvl_recipe_get();
 
 rvl_recipe *rvl_recipe_new(rvl_item_type result, uint32_t count,
-        rvl_cdict *ingredients);
+	rvl_cdict *ingredients);
 
 #endif
 

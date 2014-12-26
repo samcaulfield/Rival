@@ -4,7 +4,7 @@
 #include "rvl_scene.h"
 
 typedef enum {
-        rvl_renderer_mode_inv, rvl_renderer_mode_game
+	rvl_renderer_mode_inv, rvl_renderer_mode_game
 } rvl_renderer_mode;
 
 void rvl_renderer_add(rvl_scene *scene, rvl_entity *me, char *msg);

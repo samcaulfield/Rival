@@ -7,14 +7,14 @@
 typedef struct rvl_cnode rvl_cnode;
 
 struct rvl_cnode {
-        struct rvl_cnode *next;
-        char *key;
-        uint32_t count;
+	struct rvl_cnode *next;
+	char *key;
+	uint32_t count;
 };
 
 typedef struct {
-        rvl_cnode *first;
-        uint32_t size;
+	rvl_cnode *first;
+	uint32_t size;
 } rvl_cdict;
 
 void rvl_cdict_dec(rvl_cdict *dict, char *key);

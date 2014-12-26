@@ -6,13 +6,13 @@
 typedef struct rvl_node rvl_node;
 
 struct rvl_node {
-        struct rvl_node *next;
-        void *data;
+	struct rvl_node *next;
+	void *data;
 };
 
 typedef struct {
-        struct rvl_node *first;
-        uint32_t size;
+	struct rvl_node *first;
+	uint32_t size;
 } rvl_list;
 
 #define rvl_list_new() ((rvl_list *) calloc(1, sizeof(rvl_list)))

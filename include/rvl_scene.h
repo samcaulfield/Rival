@@ -8,12 +8,12 @@
 #define RVL_MOVES 5
 
 typedef enum {
-        rvl_down, rvl_left, rvl_none, rvl_right, rvl_up
+	rvl_down, rvl_left, rvl_none, rvl_right, rvl_up
 } rvl_direction;
 
 typedef struct {
-        uint32_t rows, columns;
-        rvl_list *entities;
+	uint32_t rows, columns;
+	rvl_list *entities;
 } rvl_scene;
 
 #define rvl_scene_add(scene, entity) (rvl_list_insert(scene->entities, entity))
@@ -31,7 +31,7 @@ uint32_t rvl_scene_distance(rvl_entity *a, rvl_entity *b);
 bool rvl_scene_generate(rvl_scene *scene);
 
 void rvl_scene_move(rvl_scene *scene, rvl_entity *player, rvl_entity *waiting,
-        rvl_direction dir);
+	rvl_direction dir);
 
 rvl_list *rvl_scene_nearby(rvl_scene *scene, rvl_entity *entity);
 
