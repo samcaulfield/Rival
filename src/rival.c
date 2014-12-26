@@ -180,6 +180,7 @@ result handle_key(char key, rvl_entity *player, rvl_entity *waiting,
                                         r->ingredients);
                                 rvl_cdict_insert(player->inventory,
                                         rvl_item_type_name(r->result));
+                                rvl_renderer_draw(scene, me);
                         }
                         rvl_renderer_set_mode(rvl_renderer_mode_game);
                         rvl_renderer_draw(scene, me);
