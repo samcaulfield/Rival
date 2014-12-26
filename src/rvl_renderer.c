@@ -165,7 +165,7 @@ void *rvl_renderer_key(char key)
         case rvl_renderer_mode_inv:
                 switch (key) {
                 case 'c':
-                        if (craftable)
+                        if (inv_select < rvl_list_size(craftable))
                                 return rvl_list_get(craftable, inv_select);
                         break;
                 }
