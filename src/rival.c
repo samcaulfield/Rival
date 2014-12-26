@@ -157,7 +157,7 @@ result handle_key(char key, rvl_entity *player, rvl_entity *waiting,
                 break;
         case END_TURN:
                 player->moves = 0;
-                waiting->moves = 5;
+                waiting->moves = RVL_MOVES;
                 if (is_user && !rvl_connection_send(END_TURN))
                         return error;
                 rvl_renderer_draw(scene, me);
@@ -171,7 +171,7 @@ result handle_key(char key, rvl_entity *player, rvl_entity *waiting,
                         rvl_renderer_draw(scene, me);
                         char in;
                         while ((in = (is_user) ? getchar() :
-                                rvl_connection_recv()) != 'i') {
+                                rvl_connection_recv()) != INVENTORY) {
                                 if (is_user && !rvl_connection_send(INVENTORY))
                                         return error;
                                 rvl_recipe *r =
