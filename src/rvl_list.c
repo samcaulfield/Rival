@@ -10,7 +10,7 @@ static void free_node(rvl_node *node, void (*free_data) (void *))
 
 static rvl_node *new_node(rvl_node *next, void *data)
 {
-	rvl_node* node = (rvl_node *) malloc(sizeof(rvl_node));
+	rvl_node* node = malloc(sizeof *node);
 	if (node) {
 		node->next = next;
 		node->data = data;

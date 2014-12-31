@@ -23,7 +23,7 @@ static rvl_list *msg_buf;
 
 static void add(char *msg)
 {
-	char *new = (char *) malloc(strlen(msg) * sizeof(char));
+	char *new = malloc(strlen(msg) * sizeof(char));
 	strcpy(new, msg);
 	rvl_list_insert(msg_buf, new);
 	if (rvl_list_size(msg_buf) > BUF_SIZE)

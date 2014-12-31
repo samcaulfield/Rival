@@ -4,7 +4,7 @@
 
 static rvl_cnode *new_node(rvl_cnode *next, char *key)
 {
-	rvl_cnode *node = (rvl_cnode *) malloc(sizeof(rvl_cnode));
+	rvl_cnode *node = malloc(sizeof *node);
 	if (node) {
 		node->count = 1;
 		node->next = next;

@@ -54,7 +54,7 @@ rvl_list *rvl_recipe_get()
 rvl_recipe *rvl_recipe_new(rvl_item_type result, uint32_t count,
 	rvl_cdict *ingredients)
 {
-	rvl_recipe *new = (rvl_recipe *) malloc(sizeof(rvl_recipe));
+	rvl_recipe *new = malloc(sizeof *new);
 	if (new) {
 		new->result = result;
 		new->count = count;

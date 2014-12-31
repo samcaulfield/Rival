@@ -18,7 +18,7 @@ char *rvl_item_type_name(rvl_item_type type)
 
 rvl_item *rvl_item_new(rvl_item_type type)
 {
-	rvl_item *item = (rvl_item *) malloc(sizeof(rvl_item));
+	rvl_item *item = malloc(sizeof *item);
 	if (item)
 		item->type = type;
 	return item;

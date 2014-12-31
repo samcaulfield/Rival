@@ -20,7 +20,7 @@ rvl_entity *rvl_entity_new(uint32_t x, uint32_t y, uint32_t moves,
 	rvl_colour colour, rvl_skin skin, rvl_entity_type type,
 	rvl_cdict *inventory)
 {
-	rvl_entity *entity = (rvl_entity *) malloc(sizeof(rvl_entity));
+	rvl_entity *entity = malloc(sizeof *entity);
 	if (entity) {
 		entity->x = x;
 		entity->y = y;

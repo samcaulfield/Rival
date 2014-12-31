@@ -116,7 +116,7 @@ rvl_list *rvl_scene_nearby(rvl_scene *scene, rvl_entity *entity)
 
 rvl_scene *rvl_scene_new(int rows, int columns, rvl_list *list)
 {
-	rvl_scene *scene = (rvl_scene *) malloc(sizeof(rvl_scene));
+	rvl_scene *scene = malloc(sizeof *scene);
 	if (scene) {
 		scene->rows = rows;
 		scene->columns = columns;
